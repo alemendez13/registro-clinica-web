@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Clínica</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background: #f4f4f4; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { margin-top: 20px; width: 100%; padding: 10px; background: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .mensaje { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Bienvenido a la Clínica</h2>
+    <form id="miFormulario">
+        <label>Nombre Completo:</label>
+        <input type="text" name="nombre" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Teléfono:</label>
+        <input type="tel" name="telefono" required>
+
+        <label>Fecha de Nacimiento:</label>
+        <input type="date" name="fechaNacimiento" required>
+
+        <label>Género:</label>
+        <select name="genero">
+            <option value="Femenino">Femenino</option>
+            <option value="Masculino">Masculino</option>
+            <option value="No especificado">Prefiero no decir</option>
+        </select>
+
+        <button type="submit">Registrarme</button>
+        <div id="respuesta" class="mensaje"></div>
+    </form>
+
+    <script>
+        document.getElementById('miFormulario').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita que la página se recargue
+            const divRespuesta = document.getElementById('respuesta');
+            divRespuesta.innerText = "Procesando...";
+
+            // Convertimos los datos del formulario a un objeto
+            const formData = new FormData(e.target);
+            const datos = Object.fromEntries(formData.entries());
+
+            // Enviamos los datos a la función de Netlify
+            const response = await fetch('/.netlify/functions/guardarPaciente', {
+                method: 'POST',
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await response.json();
+
+            if (response.ok) {
+                divRespuesta.style.color = 'green';
+                divRespuesta.innerText = "¡Gracias! Tu registro fue exitoso.";
+                e.target.reset(); // Limpia el formulario
+            } else {
+                divRespuesta.style.color = 'red';
+                divRespuesta.innerText = "Error: " + resultado.message;
+            }
+        });
+    </script>
+</body>
+</html>
