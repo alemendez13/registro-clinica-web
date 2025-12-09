@@ -31,26 +31,12 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 2. Construir objeto de Facturación (Solo si se pidió)
-    let infoFiscal = null;
-    if (datos.requiereFactura === "true") {
-        infoFiscal = {
-            tipoPersona: datos.tipoPersona || "",
-            razonSocial: datos.razonSocial || "",
-            rfc: datos.rfc || "",
-            cp: datos.codigoPostalFiscal || "",
-            emailFactura: datos.emailFactura || "",
-            regimenFiscal: datos.regimenFiscal || "",
-            usoCFDI: datos.usoCFDI || ""
-        };
-    }
-
-    // 3. Preparar el paciente con la estructura EXACTA de tu sistema
+    // 2. Preparar el paciente 
     const nuevoPaciente = {
       // Identidad y Contacto
-      nombreCompleto: datos.nombreCompleto.toUpperCase(), // Tu sistema lo prefiere en mayúsculas
+      nombreCompleto: datos.nombreCompleto.toUpperCase(), 
       email: datos.email,
-      telefono: datos.telefono, // Celular WhatsApp
+      telefono: datos.telefono, 
       fechaNacimiento: datos.fechaNacimiento,
       genero: datos.genero,
       
@@ -62,12 +48,8 @@ exports.handler = async (event, context) => {
       escolaridad: datos.escolaridad || "",
       ocupacion: datos.ocupacion || "",
 
-      // Marketing (Origen)
+      // Marketing
       comoSeEntero: datos.comoSeEntero || "",
-      nombreReferencia: datos.nombreReferencia || "",
-
-      // Facturación
-      datosFiscales: infoFiscal, 
 
       // Campos de Control (Internos)
       fechaRegistro: new Date().toISOString(),
@@ -76,7 +58,7 @@ exports.handler = async (event, context) => {
       importado: false
     };
 
-    // 4. Guardar en Firebase
+    // 3. Guardar en Firebase
     await db.collection('pacientes').add(nuevoPaciente);
 
     return {

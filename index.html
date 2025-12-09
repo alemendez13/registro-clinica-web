@@ -7,29 +7,16 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 700px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        
-        /* Logo */
         .header { text-align: center; margin-bottom: 30px; }
         .header img { max-height: 80px; width: auto; }
-        
         h3 { border-bottom: 2px solid #e1e4e8; padding-bottom: 10px; margin-top: 30px; color: #0056b3; }
-        
         .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .form-group { flex: 1; min-width: 250px; margin-bottom: 15px; }
-        
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        input:focus, select:focus { border-color: #007bff; outline: none; }
-        
-        /* Facturación oculta por defecto */
-        #bloqueFacturacion { display: none; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .checkbox-container { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
-        .checkbox-container input { width: auto; margin-right: 10px; }
-
         button { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; margin-top: 20px; }
         button:hover { background-color: #004494; }
         button:disabled { background-color: #ccc; }
-
         .mensaje { text-align: center; margin-top: 20px; font-weight: bold; padding: 10px; border-radius: 5px; }
     </style>
 </head>
@@ -59,8 +46,8 @@
                 <label>GÉNERO *</label>
                 <select name="genero" required>
                     <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Femenino">Femenino</option>
                     <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
                     <option value="Transgénero">Transgénero</option>
                     <option value="No binario">No binario</option>
                     <option value="Prefiero no decir">Prefiero no decir</option>
@@ -81,225 +68,52 @@
 
         <h3>🌍 Datos Sociodemográficos</h3>
 
+        <datalist id="listaEstados">
+            <option value="Aguascalientes">Aguascalientes</option>
+            <option value="Baja California">Baja California</option>
+            <option value="Baja California Sur">Baja California Sur</option>
+            <option value="Campeche">Campeche</option>
+            <option value="Chiapas">Chiapas</option>
+            <option value="Chihuahua">Chihuahua</option>
+            <option value="Ciudad de México">Ciudad de México</option>
+            <option value="Coahuila">Coahuila</option>
+            <option value="Colima">Colima</option>
+            <option value="Durango">Durango</option>
+            <option value="Guanajuato">Guanajuato</option>
+            <option value="Guerrero">Guerrero</option>
+            <option value="Hidalgo">Hidalgo</option>
+            <option value="Jalisco">Jalisco</option>
+            <option value="México">México (Estado de)</option>
+            <option value="Michoacán">Michoacán</option>
+            <option value="Morelos">Morelos</option>
+            <option value="Nayarit">Nayarit</option>
+            <option value="Nuevo León">Nuevo León</option>
+            <option value="Oaxaca">Oaxaca</option>
+            <option value="Puebla">Puebla</option>
+            <option value="Querétaro">Querétaro</option>
+            <option value="Quintana Roo">Quintana Roo</option>
+            <option value="San Luis Potosí">San Luis Potosí</option>
+            <option value="Sinaloa">Sinaloa</option>
+            <option value="Sonora">Sonora</option>
+            <option value="Tabasco">Tabasco</option>
+            <option value="Tamaulipas">Tamaulipas</option>
+            <option value="Tlaxcala">Tlaxcala</option>
+            <option value="Veracruz">Veracruz</option>
+            <option value="Yucatán">Yucatán</option>
+            <option value="Zacatecas">Zacatecas</option>
+            <option value="Extranjero">Extranjero</option>
+        </datalist>
+
         <div class="form-row">
             <div class="form-group">
                 <label>LUGAR DE NACIMIENTO</label>
                 <select name="lugarNacimiento">
                     <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Ciudad de México">Ciudad de México</option>
-                    <option value="Aguascalientes">Aguascalientes</option>
-                    <option value="Baja California">Baja California</option>
-                    <option value="Estado de México">Estado de México</option>
-                    <option value="Jalisco">Jalisco</option>
-                    <option value="Nuevo León">Nuevo León</option>
-                    <option value="Puebla">Puebla</option>
-                    <option value="Querétaro">Querétaro</option>
-                    <option value="Yucatán">Yucatán</option>
-                    <option value="Otro / Extranjero">Otro / Extranjero</option>
+                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="Hidalgo">Hidalgo</option><option value="Jalisco">Jalisco</option><option value="México">México (Estado de)</option><option value="Michoacán">Michoacán</option><option value="Morelos">Morelos</option><option value="Nayarit">Nayarit</option><option value="Nuevo León">Nuevo León</option><option value="Oaxaca">Oaxaca</option><option value="Puebla">Puebla</option><option value="Querétaro">Querétaro</option><option value="Quintana Roo">Quintana Roo</option><option value="San Luis Potosí">San Luis Potosí</option><option value="Sinaloa">Sinaloa</option><option value="Sonora">Sonora</option><option value="Tabasco">Tabasco</option><option value="Tamaulipas">Tamaulipas</option><option value="Tlaxcala">Tlaxcala</option><option value="Veracruz">Veracruz</option><option value="Yucatán">Yucatán</option><option value="Zacatecas">Zacatecas</option><option value="Extranjero">Extranjero</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>LUGAR DE RESIDENCIA</label>
                 <select name="lugarResidencia">
                     <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Ciudad de México">Ciudad de México</option>
-                    <option value="Estado de México">Estado de México</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>ESTADO CIVIL</label>
-                <select name="estadoCivil">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Soltero">Soltero/a</option>
-                    <option value="Casado">Casado/a</option>
-                    <option value="Divorciado">Divorciado/a</option>
-                    <option value="Viudo">Viudo/a</option>
-                    <option value="Unión Libre">Unión Libre</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>RELIGIÓN</label>
-                <select name="religion">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Ninguna">Ninguna</option>
-                    <option value="Catolicismo">Catolicismo</option>
-                    <option value="Cristianismo">Cristianismo</option>
-                    <option value="Testigo de Jehová">Testigo de Jehová</option>
-                    <option value="Judaísmo">Judaísmo</option>
-                    <option value="Islam">Islam</option>
-                    <option value="Budismo">Budismo</option>
-                    <option value="Otra">Otra</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>ESCOLARIDAD</label>
-                <select name="escolaridad">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Primaria">Primaria</option>
-                    <option value="Secundaria">Secundaria</option>
-                    <option value="Preparatoria">Preparatoria</option>
-                    <option value="Licenciatura">Licenciatura</option>
-                    <option value="Maestría">Maestría</option>
-                    <option value="Doctorado">Doctorado</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>OCUPACIÓN</label>
-                <input type="text" name="ocupacion">
-            </div>
-        </div>
-
-        <h3>📢 Cómo se enteró de nosotros</h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>MEDIO DE CONTACTO *</label>
-                <select name="comoSeEntero" required>
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Google">Google</option>
-                    <option value="Doctoralia">Doctoralia</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="Facebook">Facebook</option>
-                    <option value="Página Web">Página Web</option>
-                    <option value="WhatsApp">WhatsApp</option>
-                    <option value="Recomendación Familiar">Recomendación Familiar</option>
-                    <option value="Recomendación Profesional Salud">Recomendación Profesional Salud</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>NOMBRE DE QUIEN REFIERE (Opcional)</label>
-                <input type="text" name="nombreReferencia" placeholder="Nombre del médico o familiar">
-            </div>
-        </div>
-
-        <div class="checkbox-container">
-            <input type="checkbox" id="checkFactura" name="requiereFactura" value="true">
-            <label for="checkFactura" style="margin:0; cursor:pointer;">¿Requiere Factura?</label>
-        </div>
-
-        <div id="bloqueFacturacion">
-            <h3>💼 Datos de Facturación</h3>
-            
-            <div class="form-group">
-                <label>TIPO DE PERSONA</label>
-                <select name="tipoPersona">
-                    <option value="Física">Física</option>
-                    <option value="Moral">Moral</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>RAZÓN SOCIAL / NOMBRE COMPLETO</label>
-                <input type="text" name="razonSocial">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>RFC</label>
-                    <input type="text" name="rfc">
-                </div>
-                <div class="form-group">
-                    <label>CÓDIGO POSTAL FISCAL</label>
-                    <input type="text" name="codigoPostalFiscal">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>EMAIL PARA FACTURA</label>
-                <input type="email" name="emailFactura">
-            </div>
-
-            <div class="form-group">
-                <label>RÉGIMEN FISCAL</label>
-                <select name="regimenFiscal">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="605 - Sueldos y Salarios">605 - Sueldos y Salarios</option>
-                    <option value="612 - Personas Físicas con Actividades Empresariales">612 - Personas Físicas con Actividades...</option>
-                    <option value="626 - Régimen Simplificado de Confianza">626 - RESICO</option>
-                    <option value="601 - General de Ley Personas Morales">601 - General de Ley Personas Morales</option>
-                    <option value="G03 - Gastos en general">G03 - Gastos en general</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>USO DE CFDI</label>
-                <select name="usoCFDI">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="D01 - Honorarios médicos">D01 - Honorarios médicos</option>
-                    <option value="G03 - Gastos en general">G03 - Gastos en general</option>
-                    <option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option>
-                </select>
-            </div>
-        </div>
-
-        <button type="submit" id="btnEnviar">Guardar Expediente</button>
-        <div id="respuesta" class="mensaje"></div>
-    </form>
-</div>
-
-<script>
-    // 1. Lógica para mostrar/ocultar facturación
-    const checkFactura = document.getElementById('checkFactura');
-    const bloqueFacturacion = document.getElementById('bloqueFacturacion');
-    
-    checkFactura.addEventListener('change', function() {
-        if(this.checked) {
-            bloqueFacturacion.style.display = 'block';
-        } else {
-            bloqueFacturacion.style.display = 'none';
-        }
-    });
-
-    // 2. Lógica de envío del formulario
-    document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnEnviar');
-        const divRespuesta = document.getElementById('respuesta');
-        
-        btn.disabled = true;
-        btn.innerText = "Guardando...";
-        divRespuesta.innerText = "";
-        divRespuesta.style.backgroundColor = "transparent";
-
-        const formData = new FormData(e.target);
-        const datos = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch('/.netlify/functions/guardarPaciente', {
-                method: 'POST',
-                body: JSON.stringify(datos)
-            });
-
-            const resultado = await response.json();
-
-            if (response.ok) {
-                divRespuesta.style.color = '#155724';
-                divRespuesta.style.backgroundColor = '#d4edda';
-                divRespuesta.innerText = "¡Registro exitoso! Ya puede cerrar esta ventana.";
-                e.target.reset();
-                bloqueFacturacion.style.display = 'none'; // Ocultar facturación tras reset
-            } else {
-                divRespuesta.style.color = '#721c24';
-                divRespuesta.style.backgroundColor = '#f8d7da';
-                divRespuesta.innerText = "Error: " + resultado.message;
-            }
-        } catch (err) {
-            divRespuesta.style.color = '#721c24';
-            divRespuesta.innerText = "Error de conexión. Intente nuevamente.";
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Guardar Expediente";
-        }
-    });
-</script>
-
-</body>
-</html>
+                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="
