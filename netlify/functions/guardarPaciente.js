@@ -31,14 +31,28 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 2. Preparar el paciente 
+    // 2. Construir objeto de Facturación (Si aplica)
+    let infoFiscal = null;
+    if (datos.requiereFactura === "true") {
+        infoFiscal = {
+            tipoPersona: datos.tipoPersona || "",
+            razonSocial: datos.razonSocial || "",
+            rfc: datos.rfc || "",
+            codigoPostalFiscal: datos.codigoPostalFiscal || "",
+            emailFactura: datos.emailFactura || "",
+            regimenFiscal: datos.regimenFiscal || "",
+            usoCFDI: datos.usoCFDI || ""
+        };
+    }
+
+    // 3. Preparar el paciente (Estructura corregida)
     const nuevoPaciente = {
       // Identidad y Contacto
       nombreCompleto: datos.nombreCompleto.toUpperCase(), 
-      email: datos.email,
-      telefono: datos.telefono, 
       fechaNacimiento: datos.fechaNacimiento,
       genero: datos.genero,
+      telefono: datos.telefono, // WhatsApp
+      email: datos.email,
       
       // Datos Sociodemográficos
       lugarNacimiento: datos.lugarNacimiento || "",
@@ -46,19 +60,21 @@ exports.handler = async (event, context) => {
       estadoCivil: datos.estadoCivil || "",
       religion: datos.religion || "",
       escolaridad: datos.escolaridad || "",
-      ocupacion: datos.ocupacion || "",
+      ocupacion: datos.ocupacion || "", // Ahora es lista desplegable
 
       // Marketing
       comoSeEntero: datos.comoSeEntero || "",
+      
+      // Facturación
+      datosFiscales: infoFiscal, 
 
-      // Campos de Control (Internos)
+      // Campos de Control Interno
       fechaRegistro: new Date().toISOString(),
       origen: "web_autoregistro",
       validadoPorRecepcion: false,
       importado: false
     };
 
-    // 3. Guardar en Firebase
     await db.collection('pacientes').add(nuevoPaciente);
 
     return {

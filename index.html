@@ -14,6 +14,10 @@
         .form-group { flex: 1; min-width: 250px; margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #007bff; outline: none; }
+        #bloqueFacturacion { display: none; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .checkbox-container { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+        .checkbox-container input { width: auto; margin-right: 10px; }
         button { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; margin-top: 20px; }
         button:hover { background-color: #004494; }
         button:disabled { background-color: #ccc; }
@@ -31,12 +35,10 @@
     <form id="formRegistro">
         
         <h3>👤 Identidad y Contacto</h3>
-        
         <div class="form-group">
             <label>NOMBRE COMPLETO (Mayúsculas) *</label>
             <input type="text" name="nombreCompleto" placeholder="APELLIDOS NOMBRES" required style="text-transform: uppercase;">
         </div>
-
         <div class="form-row">
             <div class="form-group">
                 <label>FECHA NACIMIENTO *</label>
@@ -54,7 +56,6 @@
                 </select>
             </div>
         </div>
-
         <div class="form-row">
             <div class="form-group">
                 <label>CELULAR (WHATSAPP) *</label>
@@ -67,69 +68,27 @@
         </div>
 
         <h3>🌍 Datos Sociodemográficos</h3>
-
-        <datalist id="listaEstados">
-            <option value="Aguascalientes">Aguascalientes</option>
-            <option value="Baja California">Baja California</option>
-            <option value="Baja California Sur">Baja California Sur</option>
-            <option value="Campeche">Campeche</option>
-            <option value="Chiapas">Chiapas</option>
-            <option value="Chihuahua">Chihuahua</option>
-            <option value="Ciudad de México">Ciudad de México</option>
-            <option value="Coahuila">Coahuila</option>
-            <option value="Colima">Colima</option>
-            <option value="Durango">Durango</option>
-            <option value="Guanajuato">Guanajuato</option>
-            <option value="Guerrero">Guerrero</option>
-            <option value="Hidalgo">Hidalgo</option>
-            <option value="Jalisco">Jalisco</option>
-            <option value="México">México (Estado de)</option>
-            <option value="Michoacán">Michoacán</option>
-            <option value="Morelos">Morelos</option>
-            <option value="Nayarit">Nayarit</option>
-            <option value="Nuevo León">Nuevo León</option>
-            <option value="Oaxaca">Oaxaca</option>
-            <option value="Puebla">Puebla</option>
-            <option value="Querétaro">Querétaro</option>
-            <option value="Quintana Roo">Quintana Roo</option>
-            <option value="San Luis Potosí">San Luis Potosí</option>
-            <option value="Sinaloa">Sinaloa</option>
-            <option value="Sonora">Sonora</option>
-            <option value="Tabasco">Tabasco</option>
-            <option value="Tamaulipas">Tamaulipas</option>
-            <option value="Tlaxcala">Tlaxcala</option>
-            <option value="Veracruz">Veracruz</option>
-            <option value="Yucatán">Yucatán</option>
-            <option value="Zacatecas">Zacatecas</option>
-            <option value="Extranjero">Extranjero</option>
-        </datalist>
-
         <div class="form-row">
             <div class="form-group">
                 <label>LUGAR DE NACIMIENTO</label>
-                <select name="lugarNacimiento">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="Hidalgo">Hidalgo</option><option value="Jalisco">Jalisco</option><option value="México">México (Estado de)</option><option value="Michoacán">Michoacán</option><option value="Morelos">Morelos</option><option value="Nayarit">Nayarit</option><option value="Nuevo León">Nuevo León</option><option value="Oaxaca">Oaxaca</option><option value="Puebla">Puebla</option><option value="Querétaro">Querétaro</option><option value="Quintana Roo">Quintana Roo</option><option value="San Luis Potosí">San Luis Potosí</option><option value="Sinaloa">Sinaloa</option><option value="Sonora">Sonora</option><option value="Tabasco">Tabasco</option><option value="Tamaulipas">Tamaulipas</option><option value="Tlaxcala">Tlaxcala</option><option value="Veracruz">Veracruz</option><option value="Yucatán">Yucatán</option><option value="Zacatecas">Zacatecas</option><option value="Extranjero">Extranjero</option>
-                </select>
+                <select name="lugarNacimiento" id="listaEstadosNac">
+                    </select>
             </div>
             <div class="form-group">
                 <label>LUGAR DE RESIDENCIA</label>
-                <select name="lugarResidencia">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="Hidalgo">Hidalgo</option><option value="Jalisco">Jalisco</option><option value="México">México (Estado de)</option><option value="Michoacán">Michoacán</option><option value="Morelos">Morelos</option><option value="Nayarit">Nayarit</option><option value="Nuevo León">Nuevo León</option><option value="Oaxaca">Oaxaca</option><option value="Puebla">Puebla</option><option value="Querétaro">Querétaro</option><option value="Quintana Roo">Quintana Roo</option><option value="San Luis Potosí">San Luis Potosí</option><option value="Sinaloa">Sinaloa</option><option value="Sonora">Sonora</option><option value="Tabasco">Tabasco</option><option value="Tamaulipas">Tamaulipas</option><option value="Tlaxcala">Tlaxcala</option><option value="Veracruz">Veracruz</option><option value="Yucatán">Yucatán</option><option value="Zacatecas">Zacatecas</option><option value="Extranjero">Extranjero</option>
-                </select>
+                <select name="lugarResidencia" id="listaEstadosRes">
+                    </select>
             </div>
         </div>
-
         <div class="form-row">
             <div class="form-group">
                 <label>ESTADO CIVIL</label>
                 <select name="estadoCivil">
                     <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Soltero">Soltero</option>
-                    <option value="Casado">Casado</option>
-                    <option value="Divorciado">Divorciado</option>
-                    <option value="Viudo">Viudo</option>
+                    <option value="Soltero">Soltero/a</option>
+                    <option value="Casado">Casado/a</option>
+                    <option value="Divorciado">Divorciado/a</option>
+                    <option value="Viudo">Viudo/a</option>
                     <option value="Concubinato">Concubinato</option>
                 </select>
             </div>
@@ -148,7 +107,6 @@
                 </select>
             </div>
         </div>
-
         <div class="form-row">
             <div class="form-group">
                 <label>ESCOLARIDAD</label>
@@ -185,9 +143,9 @@
         </div>
 
         <h3>📢 Cómo se enteró de SANSCE</h3>
-        
         <div class="form-group">
-            <select name="comoSeEntero" required>
+            <label>MEDIO DE CONTACTO</label>
+            <select name="comoSeEntero">
                 <option value="" disabled selected>Seleccionar...</option>
                 <option value="Doctoralia">Doctoralia</option>
                 <option value="Facebook">Facebook</option>
@@ -201,19 +159,69 @@
             </select>
         </div>
 
-        <button type="submit" id="btnEnviar">Guardar Expediente</button>
+        <div class="checkbox-container">
+            <input type="checkbox" id="checkFactura" name="requiereFactura" value="true">
+            <label for="checkFactura" style="margin:0; cursor:pointer;">¿Requiere Factura?</label>
+        </div>
+        <div id="bloqueFacturacion">
+            <h3>💼 Datos de Facturación</h3>
+            <div class="form-group"><label>TIPO DE PERSONA</label><select name="tipoPersona"><option value="Física">Física</option><option value="Moral">Moral</option></select></div>
+            <div class="form-group"><label>RAZÓN SOCIAL / NOMBRE</label><input type="text" name="razonSocial"></div>
+            <div class="form-row">
+                <div class="form-group"><label>RFC</label><input type="text" name="rfc"></div>
+                <div class="form-group"><label>C.P. FISCAL</label><input type="text" name="codigoPostalFiscal"></div>
+            </div>
+            <div class="form-group"><label>EMAIL FACTURA</label><input type="email" name="emailFactura"></div>
+            <div class="form-group"><label>RÉGIMEN FISCAL</label><select name="regimenFiscal"><option value="" disabled selected>Seleccionar...</option><option value="605 - Sueldos y Salarios">605 - Sueldos y Salarios</option><option value="612 - Personas Físicas con Actividades Empresariales">612 - Personas Físicas Act. Emp.</option><option value="626 - RESICO">626 - RESICO</option><option value="601 - General de Ley Personas Morales">601 - General Personas Morales</option><option value="G03 - Gastos en general">G03 - Gastos en general</option></select></div>
+            <div class="form-group"><label>USO DE CFDI</label><select name="usoCFDI"><option value="" disabled selected>Seleccionar...</option><option value="D01 - Honorarios médicos">D01 - Honorarios médicos</option><option value="G03 - Gastos en general">G03 - Gastos en general</option><option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option></select></div>
+        </div>
+
+        <button type="submit" id="btnEnviar">Guardar Registro</button>
         <div id="respuesta" class="mensaje"></div>
     </form>
 </div>
 
 <script>
+    // GENERAR LISTA DE ESTADOS AUTOMÁTICAMENTE
+    const estados = [
+        "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
+        "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato", "Guerrero",
+        "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla",
+        "Querétaro", "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas",
+        "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas", "Extranjero"
+    ];
+    
+    const selectNac = document.getElementById("listaEstadosNac");
+    const selectRes = document.getElementById("listaEstadosRes");
+    
+    // Función para llenar selects
+    function llenarEstados(selector) {
+        selector.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+        estados.forEach(estado => {
+            const option = document.createElement("option");
+            option.value = estado;
+            option.text = estado;
+            selector.appendChild(option);
+        });
+    }
+    llenarEstados(selectNac);
+    llenarEstados(selectRes);
+
+    // LOGICA FACTURACION
+    const checkFactura = document.getElementById('checkFactura');
+    const bloqueFacturacion = document.getElementById('bloqueFacturacion');
+    checkFactura.addEventListener('change', function() {
+        bloqueFacturacion.style.display = this.checked ? 'block' : 'none';
+    });
+
+    // ENVIO DEL FORMULARIO
     document.getElementById('formRegistro').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btnEnviar');
         const divRespuesta = document.getElementById('respuesta');
         
         btn.disabled = true;
-        btn.innerText = "Guardando...";
+        btn.innerText = "Procesando...";
         divRespuesta.innerText = "";
         divRespuesta.style.backgroundColor = "transparent";
 
@@ -225,28 +233,27 @@
                 method: 'POST',
                 body: JSON.stringify(datos)
             });
-
-            const resultado = await response.json();
+            const result = await response.json();
 
             if (response.ok) {
                 divRespuesta.style.color = '#155724';
                 divRespuesta.style.backgroundColor = '#d4edda';
-                divRespuesta.innerText = "¡Registro exitoso! Ya puede cerrar esta ventana.";
+                divRespuesta.innerText = "¡Registro exitoso! Gracias.";
                 e.target.reset();
+                bloqueFacturacion.style.display = 'none';
             } else {
                 divRespuesta.style.color = '#721c24';
                 divRespuesta.style.backgroundColor = '#f8d7da';
-                divRespuesta.innerText = "Error: " + resultado.message;
+                divRespuesta.innerText = "Error: " + result.message;
             }
         } catch (err) {
             divRespuesta.style.color = '#721c24';
             divRespuesta.innerText = "Error de conexión.";
         } finally {
             btn.disabled = false;
-            btn.innerText = "Guardar Expediente";
+            btn.innerText = "Guardar Registro";
         }
     });
 </script>
-
 </body>
 </html>
