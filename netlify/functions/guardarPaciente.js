@@ -17,7 +17,7 @@ exports.handler = async (event, context) => {
   try {
     const datos = JSON.parse(event.body);
 
-    // 1. Validación de duplicados (por email)
+    // 1. Evitar duplicados por email
     if (datos.email) {
       const busqueda = await db.collection('pacientes')
         .where('email', '==', datos.email)
@@ -31,29 +31,52 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 2. Preparar el nuevo paciente (CON TODOS LOS CAMPOS NUEVOS)
+    // 2. Construir objeto de Facturación (Solo si se pidió)
+    let infoFiscal = null;
+    if (datos.requiereFactura === "true") {
+        infoFiscal = {
+            tipoPersona: datos.tipoPersona || "",
+            razonSocial: datos.razonSocial || "",
+            rfc: datos.rfc || "",
+            cp: datos.codigoPostalFiscal || "",
+            emailFactura: datos.emailFactura || "",
+            regimenFiscal: datos.regimenFiscal || "",
+            usoCFDI: datos.usoCFDI || ""
+        };
+    }
+
+    // 3. Preparar el paciente con la estructura EXACTA de tu sistema
     const nuevoPaciente = {
-      // --- DATOS PRINCIPALES ---
-      nombreCompleto: datos.nombreCompleto, // CORREGIDO: Usamos nombreCompleto
+      // Identidad y Contacto
+      nombreCompleto: datos.nombreCompleto.toUpperCase(), // Tu sistema lo prefiere en mayúsculas
       email: datos.email,
-      telefono: datos.telefono,
+      telefono: datos.telefono, // Celular WhatsApp
       fechaNacimiento: datos.fechaNacimiento,
       genero: datos.genero,
       
-      // --- DATOS ADICIONALES (Según tus capturas) ---
-      estadoCivil: datos.estadoCivil || "",
-      escolaridad: datos.escolaridad || "",
+      // Datos Sociodemográficos
+      lugarNacimiento: datos.lugarNacimiento || "",
       lugarResidencia: datos.lugarResidencia || "",
-      historialMedicoPrevio: datos.historialMedicoPrevio || "",
-      datosFiscales: null, // Lo dejamos vacío por ahora como en tu base actual
+      estadoCivil: datos.estadoCivil || "",
+      religion: datos.religion || "",
+      escolaridad: datos.escolaridad || "",
+      ocupacion: datos.ocupacion || "",
 
-      // --- CAMPOS DE CONTROL ---
+      // Marketing (Origen)
+      comoSeEntero: datos.comoSeEntero || "",
+      nombreReferencia: datos.nombreReferencia || "",
+
+      // Facturación
+      datosFiscales: infoFiscal, 
+
+      // Campos de Control (Internos)
       fechaRegistro: new Date().toISOString(),
       origen: "web_autoregistro",
       validadoPorRecepcion: false,
       importado: false
     };
 
+    // 4. Guardar en Firebase
     await db.collection('pacientes').add(nuevoPaciente);
 
     return {
@@ -65,7 +88,7 @@ exports.handler = async (event, context) => {
     console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error en el sistema: ' + error.message })
+      body: JSON.stringify({ message: 'Error interno: ' + error.message })
     };
   }
 };
