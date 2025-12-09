@@ -116,4 +116,137 @@
                 <label>LUGAR DE RESIDENCIA</label>
                 <select name="lugarResidencia">
                     <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="
+                    <option value="Aguascalientes">Aguascalientes</option><option value="Baja California">Baja California</option><option value="Baja California Sur">Baja California Sur</option><option value="Campeche">Campeche</option><option value="Chiapas">Chiapas</option><option value="Chihuahua">Chihuahua</option><option value="Ciudad de México">Ciudad de México</option><option value="Coahuila">Coahuila</option><option value="Colima">Colima</option><option value="Durango">Durango</option><option value="Guanajuato">Guanajuato</option><option value="Guerrero">Guerrero</option><option value="Hidalgo">Hidalgo</option><option value="Jalisco">Jalisco</option><option value="México">México (Estado de)</option><option value="Michoacán">Michoacán</option><option value="Morelos">Morelos</option><option value="Nayarit">Nayarit</option><option value="Nuevo León">Nuevo León</option><option value="Oaxaca">Oaxaca</option><option value="Puebla">Puebla</option><option value="Querétaro">Querétaro</option><option value="Quintana Roo">Quintana Roo</option><option value="San Luis Potosí">San Luis Potosí</option><option value="Sinaloa">Sinaloa</option><option value="Sonora">Sonora</option><option value="Tabasco">Tabasco</option><option value="Tamaulipas">Tamaulipas</option><option value="Tlaxcala">Tlaxcala</option><option value="Veracruz">Veracruz</option><option value="Yucatán">Yucatán</option><option value="Zacatecas">Zacatecas</option><option value="Extranjero">Extranjero</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>ESTADO CIVIL</label>
+                <select name="estadoCivil">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Soltero">Soltero</option>
+                    <option value="Casado">Casado</option>
+                    <option value="Divorciado">Divorciado</option>
+                    <option value="Viudo">Viudo</option>
+                    <option value="Concubinato">Concubinato</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>RELIGIÓN</label>
+                <select name="religion">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Catolicismo">Catolicismo</option>
+                    <option value="Judaísmo">Judaísmo</option>
+                    <option value="Cristianismo">Cristianismo</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Testigo de Jehová">Testigo de Jehová</option>
+                    <option value="Budismo">Budismo</option>
+                    <option value="Hinduismo">Hinduismo</option>
+                    <option value="Otra">Otra</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>ESCOLARIDAD</label>
+                <select name="escolaridad">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Analfabeta">Analfabeta</option>
+                    <option value="Sabe leer y escribir">Sabe leer y escribir</option>
+                    <option value="Preescolar">Preescolar</option>
+                    <option value="Primaria">Primaria</option>
+                    <option value="Secundaria">Secundaria</option>
+                    <option value="Preparatoria">Preparatoria</option>
+                    <option value="Licenciatura">Licenciatura</option>
+                    <option value="Posgrado">Posgrado</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>OCUPACIÓN</label>
+                <select name="ocupacion">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Empleado">Empleado</option>
+                    <option value="Empresario">Empresario</option>
+                    <option value="Comerciante">Comerciante</option>
+                    <option value="Profesional de la salud">Profesional de la salud</option>
+                    <option value="Oficinista">Oficinista</option>
+                    <option value="Obrero">Obrero</option>
+                    <option value="Ama de casa">Ama de casa</option>
+                    <option value="Desempleado">Desempleado</option>
+                    <option value="Estudiante">Estudiante</option>
+                    <option value="Jubilado">Jubilado</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+        </div>
+
+        <h3>📢 Cómo se enteró de SANSCE</h3>
+        
+        <div class="form-group">
+            <select name="comoSeEntero" required>
+                <option value="" disabled selected>Seleccionar...</option>
+                <option value="Doctoralia">Doctoralia</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Página web">Página web</option>
+                <option value="Whatsapp">Whatsapp</option>
+                <option value="Google">Google</option>
+                <option value="Recomendación familiar">Recomendación familiar</option>
+                <option value="Recomendación Profesional de la salud">Recomendación Profesional de la salud</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
+
+        <button type="submit" id="btnEnviar">Guardar Expediente</button>
+        <div id="respuesta" class="mensaje"></div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnEnviar');
+        const divRespuesta = document.getElementById('respuesta');
+        
+        btn.disabled = true;
+        btn.innerText = "Guardando...";
+        divRespuesta.innerText = "";
+        divRespuesta.style.backgroundColor = "transparent";
+
+        const formData = new FormData(e.target);
+        const datos = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/.netlify/functions/guardarPaciente', {
+                method: 'POST',
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await response.json();
+
+            if (response.ok) {
+                divRespuesta.style.color = '#155724';
+                divRespuesta.style.backgroundColor = '#d4edda';
+                divRespuesta.innerText = "¡Registro exitoso! Ya puede cerrar esta ventana.";
+                e.target.reset();
+            } else {
+                divRespuesta.style.color = '#721c24';
+                divRespuesta.style.backgroundColor = '#f8d7da';
+                divRespuesta.innerText = "Error: " + resultado.message;
+            }
+        } catch (err) {
+            divRespuesta.style.color = '#721c24';
+            divRespuesta.innerText = "Error de conexión.";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Guardar Expediente";
+        }
+    });
+</script>
+
+</body>
+</html>
