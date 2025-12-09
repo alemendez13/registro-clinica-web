@@ -1,10 +1,7 @@
 const admin = require('firebase-admin');
 
-// Aquí leemos la "llave maestra" que pondremos en Netlify más tarde
 if (!admin.apps.length) {
-  // Truco para leer las credenciales de forma segura
   const serviceAccount = JSON.parse(process.env.MIS_CREDENCIALES_FIREBASE);
-  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
@@ -13,7 +10,6 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 exports.handler = async (event, context) => {
-  // Solo aceptamos envíos de datos (POST)
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Método no permitido' };
   }
@@ -21,7 +17,7 @@ exports.handler = async (event, context) => {
   try {
     const datos = JSON.parse(event.body);
 
-    // 1. Revisar si ya existe el paciente (por email)
+    // 1. Validación de duplicados (por email)
     if (datos.email) {
       const busqueda = await db.collection('pacientes')
         .where('email', '==', datos.email)
@@ -35,23 +31,29 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // 2. Preparar el nuevo paciente
-    // Usamos los mismos campos que vimos en tu captura de pantalla
+    // 2. Preparar el nuevo paciente (CON TODOS LOS CAMPOS NUEVOS)
     const nuevoPaciente = {
-      nombre: datos.nombre,
+      // --- DATOS PRINCIPALES ---
+      nombreCompleto: datos.nombreCompleto, // CORREGIDO: Usamos nombreCompleto
       email: datos.email,
       telefono: datos.telefono,
       fechaNacimiento: datos.fechaNacimiento,
       genero: datos.genero,
       
-      // Datos automáticos (No los llena el paciente)
-      fechaRegistro: new Date().toISOString(), // Fecha de hoy
-      origen: "web_autoregistro", // Para saber que vino de internet
-      validadoPorRecepcion: false, // Para que recepción sepa que debe revisar
+      // --- DATOS ADICIONALES (Según tus capturas) ---
+      estadoCivil: datos.estadoCivil || "",
+      escolaridad: datos.escolaridad || "",
+      lugarResidencia: datos.lugarResidencia || "",
+      historialMedicoPrevio: datos.historialMedicoPrevio || "",
+      datosFiscales: null, // Lo dejamos vacío por ahora como en tu base actual
+
+      // --- CAMPOS DE CONTROL ---
+      fechaRegistro: new Date().toISOString(),
+      origen: "web_autoregistro",
+      validadoPorRecepcion: false,
       importado: false
     };
 
-    // 3. Guardar en la colección "pacientes" de SIEMPRE
     await db.collection('pacientes').add(nuevoPaciente);
 
     return {

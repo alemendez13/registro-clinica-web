@@ -3,68 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro Clínica</title>
+    <title>Registro de Paciente</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background: #f4f4f4; }
-        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-        button { margin-top: 20px; width: 100%; padding: 10px; background: #007bff; color: white; border: none; font-size: 16px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .mensaje { margin-top: 15px; text-align: center; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background-color: #f0f2f5; display: flex; justify-content: center; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        
+        /* Estilo del Logo */
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        .logo-container img { max-width: 150px; height: auto; }
+
+        h2 { text-align: center; color: #333; margin-bottom: 25px; }
+        
+        label { display: block; margin-top: 15px; font-weight: 600; color: #555; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        input:focus, select:focus, textarea:focus { border-color: #007bff; outline: none; }
+        
+        /* Botón */
+        button { margin-top: 30px; width: 100%; padding: 14px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .mensaje { margin-top: 20px; text-align: center; font-weight: bold; padding: 10px; border-radius: 6px; }
+        .obligatorio { color: red; margin-left: 3px; }
     </style>
 </head>
 <body>
-    <h2 style="text-align: center;">Bienvenido a la Clínica</h2>
-    <form id="miFormulario">
-        <label>Nombre Completo:</label>
-        <input type="text" name="nombre" required>
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+    <div class="container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo Clínica" onerror="this.style.display='none'">
+        </div>
 
-        <label>Teléfono:</label>
-        <input type="tel" name="telefono" required>
+        <h2>Registro de Paciente Nuevo</h2>
+        
+        <form id="miFormulario">
+            <label>Nombre Completo <span class="obligatorio">*</span></label>
+            <input type="text" name="nombreCompleto" placeholder="Ej. Juan Pérez López" required>
 
-        <label>Fecha de Nacimiento:</label>
-        <input type="date" name="fechaNacimiento" required>
+            <label>Correo Electrónico <span class="obligatorio">*</span></label>
+            <input type="email" name="email" placeholder="ejemplo@correo.com" required>
 
-        <label>Género:</label>
-        <select name="genero">
-            <option value="Femenino">Femenino</option>
-            <option value="Masculino">Masculino</option>
-            <option value="No especificado">Prefiero no decir</option>
-        </select>
+            <label>Teléfono Móvil <span class="obligatorio">*</span></label>
+            <input type="tel" name="telefono" placeholder="10 dígitos" required>
 
-        <button type="submit">Registrarme</button>
-        <div id="respuesta" class="mensaje"></div>
-    </form>
+            <label>Fecha de Nacimiento <span class="obligatorio">*</span></label>
+            <input type="date" name="fechaNacimiento" required>
+
+            <label>Género <span class="obligatorio">*</span></label>
+            <select name="genero" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Masculino">Masculino</option>
+                <option value="No especificado">Prefiero no decirlo</option>
+            </select>
+
+            <label>Estado Civil <span class="obligatorio">*</span></label>
+            <select name="estadoCivil" required>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="Soltero">Soltero/a</option>
+                <option value="Casado">Casado/a</option>
+                <option value="Divorciado">Divorciado/a</option>
+                <option value="Viudo">Viudo/a</option>
+                <option value="Union Libre">Unión Libre</option>
+            </select>
+
+            <label>Escolaridad</label>
+            <input type="text" name="escolaridad" placeholder="Ej. Licenciatura, Preparatoria...">
+
+            <label>Lugar de Residencia (Ciudad)</label>
+            <input type="text" name="lugarResidencia" placeholder="Ej. Ciudad de México">
+
+            <label>Historial Médico Previo (Breve)</label>
+            <textarea name="historialMedicoPrevio" rows="3" placeholder="Alergias, cirugías previas, padecimientos crónicos..."></textarea>
+
+            <button type="submit" id="btnEnviar">Guardar Registro</button>
+            <div id="respuesta" class="mensaje"></div>
+        </form>
+    </div>
 
     <script>
         document.getElementById('miFormulario').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Evita que la página se recargue
+            e.preventDefault();
+            const btn = document.getElementById('btnEnviar');
             const divRespuesta = document.getElementById('respuesta');
-            divRespuesta.innerText = "Procesando...";
+            
+            // Bloquear botón para evitar doble clic
+            btn.disabled = true;
+            btn.innerText = "Procesando...";
+            divRespuesta.innerText = "";
+            divRespuesta.style.backgroundColor = "transparent";
 
-            // Convertimos los datos del formulario a un objeto
             const formData = new FormData(e.target);
             const datos = Object.fromEntries(formData.entries());
 
-            // Enviamos los datos a la función de Netlify
-            const response = await fetch('/.netlify/functions/guardarPaciente', {
-                method: 'POST',
-                body: JSON.stringify(datos)
-            });
+            try {
+                const response = await fetch('/.netlify/functions/guardarPaciente', {
+                    method: 'POST',
+                    body: JSON.stringify(datos)
+                });
 
-            const resultado = await response.json();
+                const resultado = await response.json();
 
-            if (response.ok) {
-                divRespuesta.style.color = 'green';
-                divRespuesta.innerText = "¡Gracias! Tu registro fue exitoso.";
-                e.target.reset(); // Limpia el formulario
-            } else {
-                divRespuesta.style.color = 'red';
-                divRespuesta.innerText = "Error: " + resultado.message;
+                if (response.ok) {
+                    divRespuesta.style.color = '#155724';
+                    divRespuesta.style.backgroundColor = '#d4edda';
+                    divRespuesta.innerText = "¡Registro exitoso! Sus datos han sido guardados.";
+                    e.target.reset();
+                } else {
+                    divRespuesta.style.color = '#721c24';
+                    divRespuesta.style.backgroundColor = '#f8d7da';
+                    divRespuesta.innerText = "Error: " + resultado.message;
+                }
+            } catch (err) {
+                divRespuesta.style.color = '#721c24';
+                divRespuesta.innerText = "Error de conexión. Intente nuevamente.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Guardar Registro";
             }
         });
     </script>
