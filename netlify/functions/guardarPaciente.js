@@ -17,62 +17,68 @@ exports.handler = async (event, context) => {
   try {
     const datos = JSON.parse(event.body);
 
-    // 1. Evitar duplicados por email
+    // 1. Evitar duplicados
     if (datos.email) {
       const busqueda = await db.collection('pacientes')
         .where('email', '==', datos.email)
         .get();
 
       if (!busqueda.empty) {
-        return {
-          statusCode: 409,
-          body: JSON.stringify({ message: 'Este correo ya está registrado.' })
-        };
+        return { statusCode: 409, body: JSON.stringify({ message: 'Este correo ya está registrado.' }) };
       }
     }
 
-    // 2. Construir objeto de Facturación (Si aplica)
-    let infoFiscal = null;
-    if (datos.requiereFactura === "true") {
-        infoFiscal = {
-            tipoPersona: datos.tipoPersona || "",
-            razonSocial: datos.razonSocial || "",
-            rfc: datos.rfc || "",
-            codigoPostalFiscal: datos.codigoPostalFiscal || "",
-            emailFactura: datos.emailFactura || "",
-            regimenFiscal: datos.regimenFiscal || "",
-            usoCFDI: datos.usoCFDI || ""
-        };
+    // 2. CÁLCULO DE EDAD (Vital para tu sistema antiguo)
+    let edadCalculada = 0;
+    if (datos.fechaNacimiento) {
+        const hoy = new Date();
+        const nac = new Date(datos.fechaNacimiento);
+        edadCalculada = hoy.getFullYear() - nac.getFullYear();
+        const m = hoy.getMonth() - nac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
+            edadCalculada--;
+        }
     }
 
-    // 3. Preparar el paciente (Estructura corregida)
+    // 3. Preparar el paciente (ESTRUCTURA CORREGIDA IDÉNTICA A TU APP)
     const nuevoPaciente = {
-      // Identidad y Contacto
+      // Identidad
       nombreCompleto: datos.nombreCompleto.toUpperCase(), 
       fechaNacimiento: datos.fechaNacimiento,
+      edad: edadCalculada, // <--- NUEVO: Tu sistema lo pide
       genero: datos.genero,
-      telefono: datos.telefono, // WhatsApp
+      
+      // Contacto (CORREGIDO: telefono -> telefonoCelular)
+      telefonoCelular: datos.telefono, 
       email: datos.email,
       
-      // Datos Sociodemográficos
+      // Demográficos
       lugarNacimiento: datos.lugarNacimiento || "",
       lugarResidencia: datos.lugarResidencia || "",
       estadoCivil: datos.estadoCivil || "",
       religion: datos.religion || "",
       escolaridad: datos.escolaridad || "",
-      ocupacion: datos.ocupacion || "", // Ahora es lista desplegable
+      ocupacion: datos.ocupacion || "",
 
-      // Marketing
-      comoSeEntero: datos.comoSeEntero || "",
-      
+      // Marketing (CORREGIDO: comoSeEntero -> medioMarketing)
+      medioMarketing: datos.comoSeEntero || "",
+      referidoPor: datos.nombreReferencia || "", // CORREGIDO
+
       // Facturación
-      datosFiscales: infoFiscal, 
+      datosFiscales: datos.requiereFactura === "true" ? {
+            tipoPersona: datos.tipoPersona || "Fisica",
+            razonSocial: (datos.razonSocial || "").toUpperCase(),
+            rfc: (datos.rfc || "").toUpperCase(),
+            cpFiscal: datos.codigoPostalFiscal || "", // OJO: Tu sistema usa cpFiscal
+            emailFacturacion: datos.emailFactura || "",
+            regimenFiscal: datos.regimenFiscal || "",
+            usoCFDI: datos.usoCFDI || ""
+      } : null,
 
-      // Campos de Control Interno
-      fechaRegistro: new Date().toISOString(),
+      // Control
+      fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
       origen: "web_autoregistro",
-      validadoPorRecepcion: false,
-      importado: false
+      tutor: null // Por si es menor de edad, lo dejamos null por defecto en web
     };
 
     await db.collection('pacientes').add(nuevoPaciente);
