@@ -17,14 +17,36 @@ exports.handler = async (event, context) => {
   try {
     const datos = JSON.parse(event.body);
 
-    // 1. Evitar duplicados
+    // --- VALIDACIÓN 1: IDENTIDAD CLÍNICA (Nombre + Fecha Nacimiento) ---
+    // Esto evita que "Juan Pérez" tenga 2 expedientes.
+    const nombreMayus = datos.nombreCompleto.toUpperCase();
+    
+    // NOTA: Para que esto funcione rápido, Firebase a veces pide crear un "Índice Compuesto".
+    // Si te da error en la consola, sigue el link que Firebase te dará.
+    const busquedaIdentidad = await db.collection('pacientes')
+      .where('nombreCompleto', '==', nombreMayus)
+      .where('fechaNacimiento', '==', datos.fechaNacimiento)
+      .get();
+
+    if (!busquedaIdentidad.empty) {
+      return { 
+         statusCode: 409, 
+         body: JSON.stringify({ message: 'Ya existe un paciente con este Nombre y Fecha de Nacimiento.' }) 
+      };
+    }
+
+    // --- VALIDACIÓN 2: CORREO ELECTRÓNICO (Original) ---
+    // Esto evita que se repita el email.
     if (datos.email) {
-      const busqueda = await db.collection('pacientes')
+      const busquedaEmail = await db.collection('pacientes')
         .where('email', '==', datos.email)
         .get();
 
-      if (!busqueda.empty) {
-        return { statusCode: 409, body: JSON.stringify({ message: 'Este correo ya está registrado.' }) };
+      if (!busquedaEmail.empty) {
+        return { 
+            statusCode: 409, 
+            body: JSON.stringify({ message: 'Este correo electrónico ya está registrado.' }) 
+        };
       }
     }
 
