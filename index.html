@@ -92,37 +92,60 @@
                     <option value="Concubinato">Concubinato</option>
                 </select>
             </div>
+            <div class="form-row">
             <div class="form-group">
-                <label>RELIGIÓN</label>
-                <select name="religion">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Catolicismo">Catolicismo</option>
-                    <option value="Judaísmo">Judaísmo</option>
-                    <option value="Cristianismo">Cristianismo</option>
-                    <option value="Islam">Islam</option>
-                    <option value="Testigo de Jehová">Testigo de Jehová</option>
-                    <option value="Budismo">Budismo</option>
-                    <option value="Hinduismo">Hinduismo</option>
-                    <option value="Otra">Otra</option>
-                </select>
+                <label>CURP</label>
+                <input 
+                    type="text" 
+                    name="curp" 
+                    placeholder="18 caracteres" 
+                    style="text-transform: uppercase;"
+                    minlength="18" 
+                    maxlength="18" 
+                    pattern="[A-Z0-9]{18}" 
+                    title="La CURP debe tener exactamente 18 caracteres (letras y números)."
+                >
+                <small style="color: #666; font-size: 0.8em;">Debe contener exactamente 18 caracteres.</small>
+            </div>  
+            <div class="form-group">
+                <label>GRUPO ÉTNICO</label>
+                <input type="text" name="grupoEtnico" placeholder="Ej. Náhuatl, Maya, N/A">
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>ESCOLARIDAD</label>
-                <select name="escolaridad">
-                    <option value="" disabled selected>Seleccionar...</option>
-                    <option value="Analfabeta">Analfabeta</option>
-                    <option value="Sabe leer y escribir">Sabe leer y escribir</option>
-                    <option value="Preescolar">Preescolar</option>
-                    <option value="Primaria">Primaria</option>
-                    <option value="Secundaria">Secundaria</option>
-                    <option value="Preparatoria">Preparatoria</option>
-                    <option value="Licenciatura">Licenciatura</option>
-                    <option value="Postgrado">Postgrado</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
+            <div class="form-row">
+    <div class="form-group">
+        <label>ESCOLARIDAD</label>
+        <select name="escolaridad">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="Analfabeta">Analfabeta</option>
+            <option value="Sabe leer y escribir">Sabe leer y escribir</option>
+            <option value="Preescolar">Preescolar</option>
+            <option value="Primaria">Primaria</option>
+            <option value="Secundaria">Secundaria</option>
+            <option value="Preparatoria">Preparatoria</option>
+            <option value="Carrera técnica">Carrera técnica</option>
+            <option value="Normal">Normal</option>
+            <option value="Licenciatura">Licenciatura</option>
+            <option value="Postgrado">Postgrado</option>
+            <option value="Otro">Otro</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>RELIGIÓN</label>
+        <select name="religion">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="Ninguna">Ninguna</option>
+            <option value="Catolicismo">Catolicismo</option>
+            <option value="Cristianismo">Cristianismo</option>
+            <option value="Testigo de Jehová">Testigo de Jehová</option>
+            <option value="Judaísmo">Judaísmo</option>
+            <option value="Islam">Islam</option>
+            <option value="Budismo">Budismo</option>
+            <option value="Hinduismo">Hinduismo</option>
+            <option value="Otra">Otra</option>
+        </select>
+    </div>
+</div>
             <div class="form-group">
                 <label>OCUPACIÓN</label>
                 <select name="ocupacion">
@@ -172,10 +195,54 @@
                 <div class="form-group"><label>C.P. FISCAL</label><input type="text" name="codigoPostalFiscal"></div>
             </div>
             <div class="form-group"><label>EMAIL FACTURA</label><input type="email" name="emailFactura"></div>
-            <div class="form-group"><label>RÉGIMEN FISCAL</label><select name="regimenFiscal"><option value="" disabled selected>Seleccionar...</option><option value="605 - Sueldos y Salarios">605 - Sueldos y Salarios</option><option value="612 - Personas Físicas con Actividades Empresariales">612 - Personas Físicas Act. Emp.</option><option value="626 - RESICO">626 - RESICO</option><option value="601 - General de Ley Personas Morales">601 - General Personas Morales</option><option value="G03 - Gastos en general">G03 - Gastos en general</option></select></div>
-            <div class="form-group"><label>USO DE CFDI</label><select name="usoCFDI"><option value="" disabled selected>Seleccionar...</option><option value="D01 - Honorarios médicos">D01 - Honorarios médicos</option><option value="G03 - Gastos en general">G03 - Gastos en general</option><option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option></select></div>
+            <div class="form-group">
+    <label>RÉGIMEN FISCAL</label>
+    <select name="regimenFiscal">
+        <option value="" disabled selected>Seleccionar...</option>
+        <option value="601 - General de Ley Personas Morales">601 - General de Ley Personas Morales</option>
+        <option value="603 - Personas Morales con Fines no Lucrativos">603 - Personas Morales con Fines no Lucrativos</option>
+        <option value="605 - Sueldos y Salarios e Ingresos Asimilados a Salarios">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</option>
+        <option value="606 - Arrendamiento">606 - Arrendamiento</option>
+        <option value="607 - Régimen de Enajenación o Adquisición de Bienes">607 - Régimen de Enajenación o Adquisición de Bienes</option>
+        <option value="608 - Demás ingresos">608 - Demás ingresos</option>
+        <option value="610 - Residentes en el Extranjero sin Establecimiento Permanente en México">610 - Residentes en el Extranjero sin Establecimiento Permanente en México</option>
+        <option value="611 - Ingresos por Dividendos (socios y accionistas)">611 - Ingresos por Dividendos (socios y accionistas)</option>
+        <option value="612 - Personas Físicas con Actividades Empresariales y Profesionales">612 - Personas Físicas con Actividades Empresariales y Profesionales</option>
+        <option value="614 - Ingresos por intereses">614 - Ingresos por intereses</option>
+        <option value="615 - Régimen de los ingresos por obtención de premios">615 - Régimen de los ingresos por obtención de premios</option>
+        <option value="616 - Sin obligaciones fiscales">616 - Sin obligaciones fiscales</option>
+        <option value="621 - Incorporación Fiscal">621 - Incorporación Fiscal</option>
+        <option value="625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas">625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
+        <option value="626 - Régimen Simplificado de Confianza">626 - Régimen Simplificado de Confianza</option>
+    </select>
+</div>
+            <div class="form-group">
+    <label>USO DE CFDI</label>
+    <select name="usoCFDI">
+        <option value="" disabled selected>Seleccionar...</option>
+        <option value="D01 - Honorarios médicos, dentales y gastos hospitalarios">D01 - Honorarios médicos, dentales y gastos hospitalarios</option>
+        <option value="D02 - Gastos médicos por incapacidad o discapacidad">D02 - Gastos médicos por incapacidad o discapacidad</option>
+        <option value="G01 - Adquisición de mercancías">G01 - Adquisición de mercancías</option>
+        <option value="G03 - Gastos en general">G03 - Gastos en general</option>
+        <option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option>
+        <option value="CP01 - Pagos">CP01 - Pagos</option>
+    </select>
+</div>
         </div>
-
+        <div class="checkbox-container" style="font-size: 0.85em; background: #ebf5ff; padding: 15px; border-radius: 8px;">
+    <div style="margin-bottom: 10px;">
+        <input type="checkbox" id="aceptaPrivacidad" required>
+        <label for="aceptaPrivacidad" style="display: inline;">
+            He leído y acepto el <a href="tu-link-aviso.pdf" target="_blank">Aviso de Privacidad</a> *
+        </label>
+    </div>
+    <div>
+        <input type="checkbox" id="aceptaTerminos" required>
+        <label for="aceptaTerminos" style="display: inline;">
+            Acepto los <a href="tu-link-terminos.pdf" target="_blank">Términos y Condiciones</a> *
+        </label>
+    </div>
+</div>
         <button type="submit" id="btnEnviar">Guardar Registro</button>
         <div id="respuesta" class="mensaje"></div>
     </form>
@@ -216,17 +283,33 @@
 
     // ENVIO DEL FORMULARIO
     document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnEnviar');
-        const divRespuesta = document.getElementById('respuesta');
-        
-        btn.disabled = true;
-        btn.innerText = "Procesando...";
-        divRespuesta.innerText = "";
-        divRespuesta.style.backgroundColor = "transparent";
+    e.preventDefault();
+    const privacidad = document.getElementById('aceptaPrivacidad').checked;
+    const terminos = document.getElementById('aceptaTerminos').checked;
 
-        const formData = new FormData(e.target);
-        const datos = Object.fromEntries(formData.entries());
+    if (!privacidad || !terminos) {
+        alert("⚠️ Por favor, debes leer y aceptar el Aviso de Privacidad y los Términos y Condiciones para continuar.");
+        return;
+    }
+    const btn = document.getElementById('btnEnviar');
+    const divRespuesta = document.getElementById('respuesta');
+    
+    // CORRECCIÓN: Usamos 'e.target' en lugar de 'form'
+    const curpVal = e.target.elements['curp'].value.trim();
+
+    // CORRECCIÓN: Cerramos la llave '}' que faltaba
+    if (curpVal !== "" && curpVal.length !== 18) {
+        alert("⚠️ Error: La CURP debe tener exactamente 18 caracteres. Por favor, verifícala.");
+        return; 
+    }
+
+    btn.disabled = true;
+    btn.innerText = "Procesando...";
+    divRespuesta.innerText = "";
+    divRespuesta.style.backgroundColor = "transparent";
+
+    const formData = new FormData(e.target);
+    const datos = Object.fromEntries(formData.entries());
 
         try {
             const response = await fetch('/.netlify/functions/guardarPaciente', {

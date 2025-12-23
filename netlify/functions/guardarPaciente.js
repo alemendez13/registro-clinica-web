@@ -81,6 +81,8 @@ exports.handler = async (event, context) => {
       religion: datos.religion || "",
       escolaridad: datos.escolaridad || "",
       ocupacion: datos.ocupacion || "",
+      curp: datos.curp ? datos.curp.toUpperCase() : null,
+      grupoEtnico: datos.grupoEtnico || null,
 
       // Marketing (CORREGIDO: comoSeEntero -> medioMarketing)
       medioMarketing: datos.comoSeEntero || "",
