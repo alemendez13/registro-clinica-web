@@ -233,17 +233,17 @@
     <div style="margin-bottom: 10px;">
         <input type="checkbox" id="aceptaPrivacidad" required>
         <label for="aceptaPrivacidad" style="display: inline;">
-            He leído y acepto el <a href="tu-link-aviso.pdf" target="_blank">Aviso de Privacidad</a> *
+            He leído y acepto el <a href="Aviso de Privacidad - plataforma.pdf" target="_blank">Aviso de Privacidad</a> *
         </label>
     </div>
     <div>
         <input type="checkbox" id="aceptaTerminos" required>
         <label for="aceptaTerminos" style="display: inline;">
-            Acepto los <a href="tu-link-terminos.pdf" target="_blank">Términos y Condiciones</a> *
+            Acepto los <a href="Términos y condiciones - plataforma.pdf" target="_blank">Términos y Condiciones</a> *
         </label>
     </div>
 </div>
-        <button type="submit" id="btnEnviar">Guardar Registro</button>
+        <button type="submit" id="btnEnviar" disabled>Guardar Registro</button>
         <div id="respuesta" class="mensaje"></div>
     </form>
 </div>
@@ -280,6 +280,26 @@
     checkFactura.addEventListener('change', function() {
         bloqueFacturacion.style.display = this.checked ? 'block' : 'none';
     });
+
+
+    // --- INICIO DEL AJUSTE: VALIDACIÓN LEER ANTES DE ACEPTAR ---
+const chkPrivacidad = document.getElementById('aceptaPrivacidad');
+const chkTerminos = document.getElementById('aceptaTerminos');
+const btnEnviar = document.getElementById('btnEnviar');
+
+function validarLectura() {
+    // Si ambos checkboxes están marcados, se habilita el botón
+    if (chkPrivacidad.checked && chkTerminos.checked) {
+        btnEnviar.disabled = false;
+    } else {
+        btnEnviar.disabled = true;
+    }
+}
+
+// Escuchar cambios en los checkboxes
+chkPrivacidad.addEventListener('change', validarLectura);
+chkTerminos.addEventListener('change', validarLectura);
+
 
     // ENVIO DEL FORMULARIO
     document.getElementById('formRegistro').addEventListener('submit', async (e) => {
