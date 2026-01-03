@@ -9,6 +9,12 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
+function generarSearchTags(nombre) {
+    if (!nombre) return [];
+    const palabras = nombre.trim().toUpperCase().split(/\s+/);
+    return Array.from(new Set(palabras));
+}
+
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Método no permitido' };
@@ -66,6 +72,7 @@ exports.handler = async (event, context) => {
     const nuevoPaciente = {
       // Identidad
       nombreCompleto: datos.nombreCompleto.toUpperCase(), 
+      searchKeywords: generarSearchTags(nombreMayus),
       fechaNacimiento: datos.fechaNacimiento,
       edad: edadCalculada, // <--- NUEVO: Tu sistema lo pide
       genero: datos.genero,
