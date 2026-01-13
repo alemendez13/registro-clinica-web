@@ -10,17 +10,25 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 /**
- * MEJORA: Función para limpiar acentos y normalizar texto
+ * 1. NORMALIZACIÓN ESTÁNDAR SANSCE (lib/utils.ts) [cite: 144, 153]
+ * Reemplaza a 'limpiarAcentos' manteniendo la misma lógica robusta.
  */
-function limpiarAcentos(texto) {
-    if (!texto) return "";
-    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+function superNormalize(text) {
+    if (!text) return "";
+    return text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Remueve acentos y diacríticos
+        .trim()
+        .toUpperCase();
 }
 
+/**
+ * GENERADOR DE TAGS PARA BÚSQUEDA INTELIGENTE [cite: 153, 156]
+ */
 function generarSearchTags(nombre) {
     if (!nombre) return [];
-    // Se usa el nombre ya procesado (limpio y en mayúsculas)
-    const palabras = nombre.split(/\s+/);
+    const nombreLimpio = superNormalize(nombre);
+    const palabras = nombreLimpio.split(/\s+/);
     return Array.from(new Set(palabras));
 }
 
@@ -30,13 +38,13 @@ exports.handler = async (event, context) => {
   try {
     const datos = JSON.parse(event.body);
     
-    // MEJORA 1: Limpieza profunda del nombre para evitar duplicados por acentos
-    const nombreLimpio = limpiarAcentos(datos.nombreCompleto);
+    // 2. CONSTRUCCIÓN DEL NOMBRE (Normalización Profunda) [cite: 175, 234]
+    const nombreLimpio = superNormalize(datos.nombreCompleto);
 
     const counterRef = db.collection('metadata').doc('pacientes_control');
     
     const result = await db.runTransaction(async (transaction) => {
-      // A. Validar duplicado por identidad clínica (Usando nombre limpio)
+      // A. Validar duplicado por identidad clínica [cite: 176]
       const busquedaIdentidad = await transaction.get(
         db.collection('pacientes')
           .where('nombreCompleto', '==', nombreLimpio)
@@ -44,18 +52,18 @@ exports.handler = async (event, context) => {
       );
       if (!busquedaIdentidad.empty) throw new Error("DUPLICADO_IDENTIDAD");
 
-      // B. Obtener y actualizar el contador (SE RESTITUYE VALIDACIÓN DE CONFIGURACIÓN)
+      // B. Obtener y actualizar el contador (Validación de configuración preservada) 
       const counterDoc = await transaction.get(counterRef);
       if (!counterDoc.exists) throw new Error("CONTADOR_NO_CONFIGURADO");
       
       const nuevoNumero = (counterDoc.data().ultimoFolio || 0) + 1;
       transaction.update(counterRef, { ultimoFolio: nuevoNumero });
 
-      // C. Formatear Folio
+      // C. Formatear Folio SANSCE (Norma GEC-FR-02) [cite: 157]
       const añoActual = new Date().getFullYear();
       const folioExpediente = `SANSCE-${añoActual}-${nuevoNumero.toString().padStart(4, '0')}`;
 
-      // D. CÁLCULO DE EDAD
+      // D. CÁLCULO DE EDAD [cite: 175]
       let edadCalculada = 0;
       if (datos.fechaNacimiento) {
           const hoy = new Date();
@@ -68,20 +76,22 @@ exports.handler = async (event, context) => {
 
       const partesNombre = nombreLimpio.split(/\s+/);
 
-      // E. Preparar Objeto Final (SE RESTITUYEN TODOS LOS CAMPOS OMITIDOS)
+      // E. Preparar Objeto Final (Integridad total de campos) [cite: 228-245]
       const nuevoPaciente = {
         folioExpediente,
-        nombreCompleto: nombreLimpio,
+        nombreCompleto: nombreLimpio, 
         nombres: partesNombre[0] || "",
         apellidoPaterno: partesNombre[1] || "",
         apellidoMaterno: partesNombre.slice(2).join(" ") || "",
-        searchKeywords: generarSearchTags(nombreLimpio),
+        searchKeywords: generarSearchTags(nombreLimpio), 
         fechaNacimiento: datos.fechaNacimiento,
         edad: edadCalculada,
         genero: datos.genero,
-        telefonoCelular: datos.telefono,
         email: datos.email,
-        // Campos sociodemográficos restituidos
+        // ✅ TRAZABILIDAD DUAL: Soporte para CRM Medular y App Externa 
+        telefonos: [datos.telefono], 
+        telefonoCelular: datos.telefono,
+        // Campos sociodemográficos restituidos íntegramente
         lugarNacimiento: datos.lugarNacimiento || "",
         lugarResidencia: datos.lugarResidencia || "",
         estadoCivil: datos.estadoCivil || "",
@@ -90,13 +100,13 @@ exports.handler = async (event, context) => {
         ocupacion: datos.ocupacion || "",
         curp: datos.curp ? datos.curp.toUpperCase().trim() : null,
         grupoEtnico: datos.grupoEtnico || null,
-        // Campos de marketing restituidos
+        // Campos de marketing y referencia
         medioMarketing: datos.comoSeEntero || "",
         referidoPor: datos.nombreReferencia || "",
         // Datos fiscales completos
         datosFiscales: datos.requiereFactura === "true" ? {
               tipoPersona: datos.tipoPersona || "Fisica",
-              razonSocial: limpiarAcentos(datos.razonSocial), // MEJORA 2: Razón social sin acentos
+              razonSocial: superNormalize(datos.razonSocial),
               rfc: (datos.rfc || "").toUpperCase().trim(),
               cpFiscal: datos.codigoPostalFiscal || "",
               emailFacturacion: datos.emailFactura || "",
@@ -105,7 +115,7 @@ exports.handler = async (event, context) => {
         } : null,
         fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
         origen: "web_autoregistro",
-        tutor: null // Campo restituido
+        tutor: null 
       };
 
       const newPacRef = db.collection('pacientes').doc();
@@ -120,11 +130,17 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    // SE RESTITUYE EL MANEJO DE ERRORES ESPECÍFICO
+    // 3. MANEJO DE ERRORES ORIGINAL PRESERVADO (Sin omisión de status codes)
     let msg = "Error interno";
     let code = 500;
-    if (error.message === "DUPLICADO_IDENTIDAD") { msg = "Ya existe un expediente con estos datos."; code = 409; }
-    if (error.message === "CONTADOR_NO_CONFIGURADO") { msg = "Error en configuración de folios."; code = 500; }
+    if (error.message === "DUPLICADO_IDENTIDAD") { 
+        msg = "Ya existe un expediente con estos datos."; 
+        code = 409; 
+    }
+    if (error.message === "CONTADOR_NO_CONFIGURADO") { 
+        msg = "Error en configuración de folios."; 
+        code = 500; 
+    }
     
     return { statusCode: code, body: JSON.stringify({ message: msg }) };
   }
