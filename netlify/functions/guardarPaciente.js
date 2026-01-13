@@ -16,114 +16,104 @@ function generarSearchTags(nombre) {
 }
 
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Método no permitido' };
-  }
+  if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Método no permitido' };
 
   try {
     const datos = JSON.parse(event.body);
-
-    // --- VALIDACIÓN 1: IDENTIDAD CLÍNICA (Nombre + Fecha Nacimiento) ---
-    // Esto evita que "Juan Pérez" tenga 2 expedientes.
     const nombreMayus = datos.nombreCompleto.toUpperCase();
+
+    // --- 1. LÓGICA DE FOLIO ÚNICO (TRANSACCIÓN) ---
+    const counterRef = db.collection('metadata').doc('pacientes_control');
     
-    // NOTA: Para que esto funcione rápido, Firebase a veces pide crear un "Índice Compuesto".
-    // Si te da error en la consola, sigue el link que Firebase te dará.
-    const busquedaIdentidad = await db.collection('pacientes')
-      .where('nombreCompleto', '==', nombreMayus)
-      .where('fechaNacimiento', '==', datos.fechaNacimiento)
-      .get();
+    const result = await db.runTransaction(async (transaction) => {
+      // A. Validar duplicado por identidad clínica
+      const busquedaIdentidad = await transaction.get(
+        db.collection('pacientes')
+          .where('nombreCompleto', '==', nombreMayus)
+          .where('fechaNacimiento', '==', datos.fechaNacimiento)
+      );
+      if (!busquedaIdentidad.empty) throw new Error("DUPLICADO_IDENTIDAD");
 
-    if (!busquedaIdentidad.empty) {
-      return { 
-         statusCode: 409, 
-         body: JSON.stringify({ message: 'Ya existe un paciente con este Nombre y Fecha de Nacimiento.' }) 
-      };
-    }
+      // B. Obtener y actualizar el contador
+      const counterDoc = await transaction.get(counterRef);
+      if (!counterDoc.exists) throw new Error("CONTADOR_NO_CONFIGURADO");
+      
+      const nuevoNumero = (counterDoc.data().ultimoFolio || 0) + 1;
+      transaction.update(counterRef, { ultimoFolio: nuevoNumero });
 
-    // --- VALIDACIÓN 2: CORREO ELECTRÓNICO (Original) ---
-    // Esto evita que se repita el email.
-    if (datos.email) {
-      const busquedaEmail = await db.collection('pacientes')
-        .where('email', '==', datos.email)
-        .get();
+      // C. Formatear Folio (SANSCE-2026-0001)
+      const añoActual = new Date().getFullYear();
+      const folioExpediente = `SANSCE-${añoActual}-${nuevoNumero.toString().padStart(4, '0')}`;
 
-      if (!busquedaEmail.empty) {
-        return { 
-            statusCode: 409, 
-            body: JSON.stringify({ message: 'Este correo electrónico ya está registrado.' }) 
-        };
+      // D. CÁLCULO DE EDAD
+      let edadCalculada = 0;
+      if (datos.fechaNacimiento) {
+          const hoy = new Date();
+          const nac = new Date(datos.fechaNacimiento);
+          edadCalculada = hoy.getFullYear() - nac.getFullYear();
+          if (hoy.getMonth() < nac.getMonth() || (hoy.getMonth() === nac.getMonth() && hoy.getDate() < nac.getDate())) {
+              edadCalculada--;
+          }
       }
-    }
 
-    // 2. CÁLCULO DE EDAD (Vital para tu sistema antiguo)
-    let edadCalculada = 0;
-    if (datos.fechaNacimiento) {
-        const hoy = new Date();
-        const nac = new Date(datos.fechaNacimiento);
-        edadCalculada = hoy.getFullYear() - nac.getFullYear();
-        const m = hoy.getMonth() - nac.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
-            edadCalculada--;
-        }
-    }
+      const partesNombre = nombreMayus.split(/\s+/);
+      const nombresWeb = partesNombre[0] || "";
+      const apellidoPWeb = partesNombre[1] || "";
+      const apellidoMWeb = partesNombre.slice(2).join(" ") || "";
 
-    // 3. Preparar el paciente (ESTRUCTURA CORREGIDA IDÉNTICA A TU APP)
-    const nuevoPaciente = {
-      // Identidad
-      nombreCompleto: datos.nombreCompleto.toUpperCase(), 
-      searchKeywords: generarSearchTags(nombreMayus),
-      fechaNacimiento: datos.fechaNacimiento,
-      edad: edadCalculada, // <--- NUEVO: Tu sistema lo pide
-      genero: datos.genero,
+      // E. Preparar Objeto Final
+      const nuevoPaciente = {
+  folioExpediente, // Identificador ISO 7101
+  nombres: nombresWeb,
+  apellidoPaterno: apellidoPWeb,
+  apellidoMaterno: apellidoMWeb,
+  searchKeywords: generarSearchTags(nombreMayus),
+  fechaNacimiento: datos.fechaNacimiento,
+  edad: edadCalculada,
+  genero: datos.genero,
+  telefonoCelular: datos.telefono,
+  email: datos.email,
+  lugarNacimiento: datos.lugarNacimiento || "",
+  lugarResidencia: datos.lugarResidencia || "",
+  estadoCivil: datos.estadoCivil || "",
+  religion: datos.religion || "",
+  escolaridad: datos.escolaridad || "",
+  ocupacion: datos.ocupacion || "",
+  curp: datos.curp ? datos.curp.toUpperCase() : null,
+  grupoEtnico: datos.grupoEtnico || null,
+  medioMarketing: datos.comoSeEntero || "",
+  referidoPor: datos.nombreReferencia || "",
+  datosFiscales: datos.requiereFactura === "true" ? {
+        tipoPersona: datos.tipoPersona || "Fisica",
+        razonSocial: (datos.razonSocial || "").toUpperCase(),
+        rfc: (datos.rfc || "").toUpperCase(),
+        cpFiscal: datos.codigoPostalFiscal || "",
+        emailFacturacion: datos.emailFactura || "",
+        regimenFiscal: datos.regimenFiscal || "",
+        usoCFDI: datos.usoCFDI || ""
+  } : null,
+  fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
+  origen: "web_autoregistro",
+  tutor: null
+      };
+
+      const newPacRef = db.collection('pacientes').doc();
+      transaction.set(newPacRef, nuevoPaciente);
       
-      // Contacto (CORREGIDO: telefono -> telefonoCelular)
-      telefonoCelular: datos.telefono, 
-      email: datos.email,
-      
-      // Demográficos
-      lugarNacimiento: datos.lugarNacimiento || "",
-      lugarResidencia: datos.lugarResidencia || "",
-      estadoCivil: datos.estadoCivil || "",
-      religion: datos.religion || "",
-      escolaridad: datos.escolaridad || "",
-      ocupacion: datos.ocupacion || "",
-      curp: datos.curp ? datos.curp.toUpperCase() : null,
-      grupoEtnico: datos.grupoEtnico || null,
-
-      // Marketing (CORREGIDO: comoSeEntero -> medioMarketing)
-      medioMarketing: datos.comoSeEntero || "",
-      referidoPor: datos.nombreReferencia || "", // CORREGIDO
-
-      // Facturación
-      datosFiscales: datos.requiereFactura === "true" ? {
-            tipoPersona: datos.tipoPersona || "Fisica",
-            razonSocial: (datos.razonSocial || "").toUpperCase(),
-            rfc: (datos.rfc || "").toUpperCase(),
-            cpFiscal: datos.codigoPostalFiscal || "", // OJO: Tu sistema usa cpFiscal
-            emailFacturacion: datos.emailFactura || "",
-            regimenFiscal: datos.regimenFiscal || "",
-            usoCFDI: datos.usoCFDI || ""
-      } : null,
-
-      // Control
-      fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
-      origen: "web_autoregistro",
-      tutor: null // Por si es menor de edad, lo dejamos null por defecto en web
-    };
-
-    await db.collection('pacientes').add(nuevoPaciente);
+      return { folio: folioExpediente };
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: '¡Registro Exitoso!' })
+      body: JSON.stringify({ message: '¡Registro Exitoso!', folio: result.folio })
     };
 
   } catch (error) {
-    console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Error interno: ' + error.message })
-    };
+    let msg = "Error interno";
+    let code = 500;
+    if (error.message === "DUPLICADO_IDENTIDAD") { msg = "Ya existe un expediente con estos datos."; code = 409; }
+    if (error.message === "CONTADOR_NO_CONFIGURADO") { msg = "Error en configuración de folios."; code = 500; }
+    
+    return { statusCode: code, body: JSON.stringify({ message: msg }) };
   }
 };
