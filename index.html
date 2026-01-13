@@ -16,11 +16,25 @@
         input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         input:focus, select:focus { border-color: #007bff; outline: none; }
         #bloqueFacturacion { display: none; background-color: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .checkbox-container { display: flex; align-items: center; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
-        .checkbox-container input { width: auto; margin-right: 10px; }
+        
+        /* MEJORA 5: Alineación de checkboxes legal */
+        .legal-container { 
+            display: flex; 
+            flex-direction: row; 
+            gap: 20px; 
+            background: #ebf5ff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-size: 0.85em;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .checkbox-item input { width: auto; margin: 0; cursor: pointer; }
+
         button { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; margin-top: 20px; }
         button:hover { background-color: #004494; }
-        button:disabled { background-color: #ccc; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
         .mensaje { text-align: center; margin-top: 20px; font-weight: bold; padding: 10px; border-radius: 5px; }
     </style>
 </head>
@@ -36,8 +50,8 @@
         
         <h3>👤 Identidad y Contacto</h3>
         <div class="form-group">
-            <label>NOMBRE COMPLETO (Mayúsculas sin acentos) *</label>
-            <input type="text" name="nombreCompleto" placeholder="NOMBRES APEELIDO PATERNO APELLIDO MATERNO" required style="text-transform: uppercase;">
+            <label>NOMBRE COMPLETO (Sin acentos) *</label>
+            <input type="text" name="nombreCompleto" id="nombreCompleto" placeholder="NOMBRES APELLIDO PATERNO APELLIDO MATERNO" required oninput="limpiarTexto(this)">
         </div>
         <div class="form-row">
             <div class="form-group">
@@ -71,13 +85,11 @@
         <div class="form-row">
             <div class="form-group">
                 <label>LUGAR DE NACIMIENTO</label>
-                <select name="lugarNacimiento" id="listaEstadosNac">
-                    </select>
+                <select name="lugarNacimiento" id="listaEstadosNac"></select>
             </div>
             <div class="form-group">
                 <label>LUGAR DE RESIDENCIA</label>
-                <select name="lugarResidencia" id="listaEstadosRes">
-                    </select>
+                <select name="lugarResidencia" id="listaEstadosRes"></select>
             </div>
         </div>
         <div class="form-row">
@@ -92,21 +104,21 @@
                     <option value="Concubinato">Concubinato</option>
                 </select>
             </div>
-            <div class="form-row">
             <div class="form-group">
                 <label>CURP</label>
                 <input 
                     type="text" 
                     name="curp" 
+                    id="curpInput"
                     placeholder="18 caracteres" 
                     style="text-transform: uppercase;"
-                    minlength="18" 
-                    maxlength="18" 
-                    pattern="[A-Z0-9]{18}" 
-                    title="La CURP debe tener exactamente 18 caracteres (letras y números)."
+                    maxlength="18"
                 >
                 <small style="color: #666; font-size: 0.8em;">Debe contener exactamente 18 caracteres.</small>
             </div>  
+        </div>
+
+        <div class="form-row">
             <div class="form-group">
                 <label>GRUPO ÉTNICO</label>
                 <select name="grupoEtnico">
@@ -127,41 +139,41 @@
                     <option value="Otros">Otros</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>ESCOLARIDAD</label>
+                <select name="escolaridad">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Analfabeta">Analfabeta</option>
+                    <option value="Sabe leer y escribir">Sabe leer y escribir</option>
+                    <option value="Preescolar">Preescolar</option>
+                    <option value="Primaria">Primaria</option>
+                    <option value="Secundaria">Secundaria</option>
+                    <option value="Preparatoria">Preparatoria</option>
+                    <option value="Carrera técnica">Carrera técnica</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Licenciatura">Licenciatura</option>
+                    <option value="Postgrado">Postgrado</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
         </div>
-            <div class="form-row">
-    <div class="form-group">
-        <label>ESCOLARIDAD</label>
-        <select name="escolaridad">
-            <option value="" disabled selected>Seleccionar...</option>
-            <option value="Analfabeta">Analfabeta</option>
-            <option value="Sabe leer y escribir">Sabe leer y escribir</option>
-            <option value="Preescolar">Preescolar</option>
-            <option value="Primaria">Primaria</option>
-            <option value="Secundaria">Secundaria</option>
-            <option value="Preparatoria">Preparatoria</option>
-            <option value="Carrera técnica">Carrera técnica</option>
-            <option value="Normal">Normal</option>
-            <option value="Licenciatura">Licenciatura</option>
-            <option value="Postgrado">Postgrado</option>
-            <option value="Otro">Otro</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>RELIGIÓN</label>
-        <select name="religion">
-            <option value="" disabled selected>Seleccionar...</option>
-            <option value="Ninguna">Ninguna</option>
-            <option value="Catolicismo">Catolicismo</option>
-            <option value="Cristianismo">Cristianismo</option>
-            <option value="Testigo de Jehová">Testigo de Jehová</option>
-            <option value="Judaísmo">Judaísmo</option>
-            <option value="Islam">Islam</option>
-            <option value="Budismo">Budismo</option>
-            <option value="Hinduismo">Hinduismo</option>
-            <option value="Otra">Otra</option>
-        </select>
-    </div>
-</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>RELIGIÓN</label>
+                <select name="religion">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Ninguna">Ninguna</option>
+                    <option value="Catolicismo">Catolicismo</option>
+                    <option value="Cristianismo">Cristianismo</option>
+                    <option value="Testigo de Jehová">Testigo de Jehová</option>
+                    <option value="Judaísmo">Judaísmo</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Budismo">Budismo</option>
+                    <option value="Hinduismo">Hinduismo</option>
+                    <option value="Otra">Otra</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label>OCUPACIÓN</label>
                 <select name="ocupacion">
@@ -182,96 +194,105 @@
         </div>
 
         <h3>📢 Cómo se enteró de SANSCE</h3>
-        <div class="form-group">
-            <label>MEDIO DE CONTACTO</label>
-            <select name="comoSeEntero">
-                <option value="" disabled selected>Seleccionar...</option>
-                <option value="Pacientes">Pacientes</option>
-                <option value="Doctoralia">Doctoralia</option>
-                <option value="Facebook">Facebook</option>
-                <option value="Instagram">Instagram</option>
-                <option value="Página web">Página web</option>
-                <option value="Whatsapp">Whatsapp</option>
-                <option value="Google">Google</option>
-                <option value="Recomendación familiar">Recomendación familiar</option>
-                <option value="Recomendación Profesional de la salud">Recomendación Profesional de la salud</option>
-                <option value="Otro">Otro</option>
-            </select>
+        <div class="form-row">
+            <div class="form-group">
+                <label>MEDIO DE CONTACTO</label>
+                <select name="comoSeEntero">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="Pacientes">Pacientes</option>
+                    <option value="Doctoralia">Doctoralia</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Página web">Página web</option>
+                    <option value="Whatsapp">Whatsapp</option>
+                    <option value="Google">Google</option>
+                    <option value="Recomendación familiar">Recomendación familiar</option>
+                    <option value="Recomendación Profesional de la salud">Recomendación Profesional de la salud</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>¿QUIÉN LO RECOMIENDA?</label>
+                <input type="text" name="nombreReferencia" placeholder="Nombre de persona o doctor">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>¿QUIÉN LO RECOMIENDA? (Nombre de la persona o doctor)</label>
-            <input type="text" name="nombreReferencia" placeholder="O dejar vacío si no aplica">
-        </div>
-
-        <div class="checkbox-container">
+        <div class="checkbox-item" style="margin-top: 20px; margin-bottom: 10px;">
             <input type="checkbox" id="checkFactura" name="requiereFactura" value="true">
-            <label for="checkFactura" style="margin:0; cursor:pointer;">¿Requiere Factura?</label>
+            <label for="checkFactura" style="margin:0; cursor:pointer; font-weight: bold;">¿Requiere Factura?</label>
         </div>
+
         <div id="bloqueFacturacion">
             <h3>💼 Datos de Facturación</h3>
-            <div class="form-group"><label>TIPO DE PERSONA</label><select name="tipoPersona"><option value="Física">Física</option><option value="Moral">Moral</option></select></div>
-            <div class="form-group"><label>RAZÓN SOCIAL / NOMBRE</label><input type="text" name="razonSocial"></div>
             <div class="form-row">
-                <div class="form-group"><label>RFC</label><input type="text" name="rfc"></div>
-                <div class="form-group"><label>C.P. FISCAL</label><input type="text" name="codigoPostalFiscal"></div>
+                <div class="form-group">
+                    <label>TIPO DE PERSONA</label>
+                    <select name="tipoPersona">
+                        <option value="Física">Física</option>
+                        <option value="Moral">Moral</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>RAZÓN SOCIAL / NOMBRE (Sin acentos)</label>
+                    <input type="text" name="razonSocial" id="razonSocial" oninput="limpiarTexto(this)">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>RFC</label><input type="text" name="rfc" style="text-transform: uppercase;"></div>
+                <div class="form-group"><label>CÓDIGO POSTAL</label><input type="text" name="codigoPostalFiscal"></div>
             </div>
             <div class="form-group"><label>EMAIL FACTURA</label><input type="email" name="emailFactura"></div>
             <div class="form-group">
-    <label>RÉGIMEN FISCAL</label>
-    <select name="regimenFiscal">
-        <option value="" disabled selected>Seleccionar...</option>
-        <option value="601 - General de Ley Personas Morales">601 - General de Ley Personas Morales</option>
-        <option value="603 - Personas Morales con Fines no Lucrativos">603 - Personas Morales con Fines no Lucrativos</option>
-        <option value="605 - Sueldos y Salarios e Ingresos Asimilados a Salarios">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</option>
-        <option value="606 - Arrendamiento">606 - Arrendamiento</option>
-        <option value="607 - Régimen de Enajenación o Adquisición de Bienes">607 - Régimen de Enajenación o Adquisición de Bienes</option>
-        <option value="608 - Demás ingresos">608 - Demás ingresos</option>
-        <option value="610 - Residentes en el Extranjero sin Establecimiento Permanente en México">610 - Residentes en el Extranjero sin Establecimiento Permanente en México</option>
-        <option value="611 - Ingresos por Dividendos (socios y accionistas)">611 - Ingresos por Dividendos (socios y accionistas)</option>
-        <option value="612 - Personas Físicas con Actividades Empresariales y Profesionales">612 - Personas Físicas con Actividades Empresariales y Profesionales</option>
-        <option value="614 - Ingresos por intereses">614 - Ingresos por intereses</option>
-        <option value="615 - Régimen de los ingresos por obtención de premios">615 - Régimen de los ingresos por obtención de premios</option>
-        <option value="616 - Sin obligaciones fiscales">616 - Sin obligaciones fiscales</option>
-        <option value="621 - Incorporación Fiscal">621 - Incorporación Fiscal</option>
-        <option value="625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas">625 - Régimen de las Actividades Empresariales con ingresos a través de Plataformas Tecnológicas</option>
-        <option value="626 - Régimen Simplificado de Confianza">626 - Régimen Simplificado de Confianza</option>
-    </select>
-</div>
+                <label>RÉGIMEN FISCAL</label>
+                <select name="regimenFiscal">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="601">601 - General de Ley Personas Morales</option>
+                    <option value="603">603 - Personas Morales con Fines no Lucrativos</option>
+                    <option value="605">605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</option>
+                    <option value="606">606 - Arrendamiento</option>
+                    <option value="612">612 - Personas Físicas con Actividades Empresariales y Profesionales</option>
+                    <option value="616">616 - Sin obligaciones fiscales</option>
+                    <option value="626">626 - Régimen Simplificado de Confianza</option>
+                </select>
+            </div>
             <div class="form-group">
-    <label>USO DE CFDI</label>
-    <select name="usoCFDI">
-        <option value="" disabled selected>Seleccionar...</option>
-        <option value="D01 - Honorarios médicos, dentales y gastos hospitalarios">D01 - Honorarios médicos, dentales y gastos hospitalarios</option>
-        <option value="D02 - Gastos médicos por incapacidad o discapacidad">D02 - Gastos médicos por incapacidad o discapacidad</option>
-        <option value="G01 - Adquisición de mercancías">G01 - Adquisición de mercancías</option>
-        <option value="G03 - Gastos en general">G03 - Gastos en general</option>
-        <option value="S01 - Sin efectos fiscales">S01 - Sin efectos fiscales</option>
-        <option value="CP01 - Pagos">CP01 - Pagos</option>
-    </select>
-</div>
+                <label>USO DE CFDI</label>
+                <select name="usoCFDI">
+                    <option value="" disabled selected>Seleccionar...</option>
+                    <option value="D01">D01 - Honorarios médicos, dentales y gastos hospitalarios</option>
+                    <option value="D02">D02 - Gastos médicos por incapacidad o discapacidad</option>
+                    <option value="G03">G03 - Gastos en general</option>
+                    <option value="S01">S01 - Sin efectos fiscales</option>
+                </select>
+            </div>
         </div>
-        <div class="checkbox-container" style="font-size: 0.85em; background: #ebf5ff; padding: 15px; border-radius: 8px;">
-    <div style="margin-bottom: 10px;">
-        <input type="checkbox" id="aceptaPrivacidad" required>
-        <label for="aceptaPrivacidad" style="display: inline;">
-            He leído y acepto el <a href="Aviso de Privacidad - plataforma.pdf" target="_blank">Aviso de Privacidad</a> *
-        </label>
-    </div>
-    <div>
-        <input type="checkbox" id="aceptaTerminos" required>
-        <label for="aceptaTerminos" style="display: inline;">
-            Acepto los <a href="Términos y condiciones - plataforma.pdf" target="_blank">Términos y Condiciones</a> *
-        </label>
-    </div>
-</div>
+
+        <div class="legal-container">
+            <div class="checkbox-item">
+                <input type="checkbox" id="aceptaPrivacidad" required>
+                <label for="aceptaPrivacidad">He leído el <a href="./Aviso_de_Privacidad.pdf" target="_blank">Aviso de Privacidad</a> *</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="aceptaTerminos" required>
+                <label for="aceptaTerminos">Acepto los <a href="./Terminos_y_Condiciones.pdf" target="_blank">Términos y Condiciones</a> *</label>
+            </div>
+        </div>
+
         <button type="submit" id="btnEnviar" disabled>Guardar Registro</button>
         <div id="respuesta" class="mensaje"></div>
     </form>
 </div>
 
 <script>
-    // GENERAR LISTA DE ESTADOS AUTOMÁTICAMENTE
+    // MEJORA 1 y 2: Función de limpieza universal
+    function limpiarTexto(input) {
+        let valor = input.value;
+        // Normaliza para separar acentos de las letras y luego los elimina
+        valor = valor.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+        input.value = valor.toUpperCase();
+    }
+
+    // LISTA COMPLETA DE ESTADOS (RESTAURADA)
     const estados = [
         "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
         "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato", "Guerrero",
@@ -280,78 +301,48 @@
         "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas", "Extranjero"
     ];
     
-    const selectNac = document.getElementById("listaEstadosNac");
-    const selectRes = document.getElementById("listaEstadosRes");
-    
-    // Función para llenar selects
     function llenarEstados(selector) {
         selector.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-        estados.forEach(estado => {
-            const option = document.createElement("option");
-            option.value = estado;
-            option.text = estado;
-            selector.appendChild(option);
-        });
+        estados.forEach(estado => selector.add(new Option(estado, estado)));
     }
-    llenarEstados(selectNac);
-    llenarEstados(selectRes);
+    llenarEstados(document.getElementById("listaEstadosNac"));
+    llenarEstados(document.getElementById("listaEstadosRes"));
 
     // LOGICA FACTURACION
     const checkFactura = document.getElementById('checkFactura');
     const bloqueFacturacion = document.getElementById('bloqueFacturacion');
-    checkFactura.addEventListener('change', function() {
-        bloqueFacturacion.style.display = this.checked ? 'block' : 'none';
-    });
+    checkFactura.addEventListener('change', () => bloqueFacturacion.style.display = checkFactura.checked ? 'block' : 'none');
 
+    // VALIDACION DE BOTÓN
+    const chkPrivacidad = document.getElementById('aceptaPrivacidad');
+    const chkTerminos = document.getElementById('aceptaTerminos');
+    const btnEnviar = document.getElementById('btnEnviar');
 
-    // --- INICIO DEL AJUSTE: VALIDACIÓN LEER ANTES DE ACEPTAR ---
-const chkPrivacidad = document.getElementById('aceptaPrivacidad');
-const chkTerminos = document.getElementById('aceptaTerminos');
-const btnEnviar = document.getElementById('btnEnviar');
-
-function validarLectura() {
-    // Si ambos checkboxes están marcados, se habilita el botón
-    if (chkPrivacidad.checked && chkTerminos.checked) {
-        btnEnviar.disabled = false;
-    } else {
-        btnEnviar.disabled = true;
+    function validarLectura() {
+        btnEnviar.disabled = !(chkPrivacidad.checked && chkTerminos.checked);
     }
-}
-
-// Escuchar cambios en los checkboxes
-chkPrivacidad.addEventListener('change', validarLectura);
-chkTerminos.addEventListener('change', validarLectura);
-
+    chkPrivacidad.addEventListener('change', validarLectura);
+    chkTerminos.addEventListener('change', validarLectura);
 
     // ENVIO DEL FORMULARIO
     document.getElementById('formRegistro').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const privacidad = document.getElementById('aceptaPrivacidad').checked;
-    const terminos = document.getElementById('aceptaTerminos').checked;
+        e.preventDefault();
+        
+        // MEJORA 6: Lógica CURP corregida
+        const curpVal = document.getElementById('curpInput').value.trim();
+        if (curpVal !== "" && curpVal.length !== 18) {
+            alert("⚠️ Error: La CURP debe tener exactamente 18 caracteres. Por favor, verifícala.");
+            return; 
+        }
 
-    if (!privacidad || !terminos) {
-        alert("⚠️ Por favor, debes leer y aceptar el Aviso de Privacidad y los Términos y Condiciones para continuar.");
-        return;
-    }
-    const btn = document.getElementById('btnEnviar');
-    const divRespuesta = document.getElementById('respuesta');
-    
-    // CORRECCIÓN: Usamos 'e.target' en lugar de 'form'
-    const curpVal = e.target.elements['curp'].value.trim();
+        btnEnviar.disabled = true;
+        btnEnviar.innerText = "Procesando...";
+        const divRespuesta = document.getElementById('respuesta');
+        divRespuesta.innerText = "";
+        divRespuesta.style.backgroundColor = "transparent";
 
-    // CORRECCIÓN: Cerramos la llave '}' que faltaba
-    if (curpVal !== "" && curpVal.length !== 18) {
-        alert("⚠️ Error: La CURP debe tener exactamente 18 caracteres. Por favor, verifícala.");
-        return; 
-    }
-
-    btn.disabled = true;
-    btn.innerText = "Procesando...";
-    divRespuesta.innerText = "";
-    divRespuesta.style.backgroundColor = "transparent";
-
-    const formData = new FormData(e.target);
-    const datos = Object.fromEntries(formData.entries());
+        const formData = new FormData(e.target);
+        const datos = Object.fromEntries(formData.entries());
 
         try {
             const response = await fetch('/.netlify/functions/guardarPaciente', {
@@ -363,20 +354,22 @@ chkTerminos.addEventListener('change', validarLectura);
             if (response.ok) {
                 divRespuesta.style.color = '#155724';
                 divRespuesta.style.backgroundColor = '#d4edda';
-                divRespuesta.innerText = "¡Registro exitoso! Gracias.";
+                divRespuesta.innerText = "¡Registro exitoso! Folio: " + (result.folio || "");
                 e.target.reset();
                 bloqueFacturacion.style.display = 'none';
+                btnEnviar.disabled = true;
             } else {
                 divRespuesta.style.color = '#721c24';
                 divRespuesta.style.backgroundColor = '#f8d7da';
                 divRespuesta.innerText = "Error: " + result.message;
+                btnEnviar.disabled = false;
             }
         } catch (err) {
             divRespuesta.style.color = '#721c24';
             divRespuesta.innerText = "Error de conexión.";
+            btnEnviar.disabled = false;
         } finally {
-            btn.disabled = false;
-            btn.innerText = "Guardar Registro";
+            btnEnviar.innerText = "Guardar Registro";
         }
     });
 </script>

@@ -9,9 +9,18 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
+/**
+ * MEJORA: Función para limpiar acentos y normalizar texto
+ */
+function limpiarAcentos(texto) {
+    if (!texto) return "";
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+}
+
 function generarSearchTags(nombre) {
     if (!nombre) return [];
-    const palabras = nombre.trim().toUpperCase().split(/\s+/);
+    // Se usa el nombre ya procesado (limpio y en mayúsculas)
+    const palabras = nombre.split(/\s+/);
     return Array.from(new Set(palabras));
 }
 
@@ -20,28 +29,29 @@ exports.handler = async (event, context) => {
 
   try {
     const datos = JSON.parse(event.body);
-    const nombreMayus = datos.nombreCompleto.toUpperCase();
+    
+    // MEJORA 1: Limpieza profunda del nombre para evitar duplicados por acentos
+    const nombreLimpio = limpiarAcentos(datos.nombreCompleto);
 
-    // --- 1. LÓGICA DE FOLIO ÚNICO (TRANSACCIÓN) ---
     const counterRef = db.collection('metadata').doc('pacientes_control');
     
     const result = await db.runTransaction(async (transaction) => {
-      // A. Validar duplicado por identidad clínica
+      // A. Validar duplicado por identidad clínica (Usando nombre limpio)
       const busquedaIdentidad = await transaction.get(
         db.collection('pacientes')
-          .where('nombreCompleto', '==', nombreMayus)
+          .where('nombreCompleto', '==', nombreLimpio)
           .where('fechaNacimiento', '==', datos.fechaNacimiento)
       );
       if (!busquedaIdentidad.empty) throw new Error("DUPLICADO_IDENTIDAD");
 
-      // B. Obtener y actualizar el contador
+      // B. Obtener y actualizar el contador (SE RESTITUYE VALIDACIÓN DE CONFIGURACIÓN)
       const counterDoc = await transaction.get(counterRef);
       if (!counterDoc.exists) throw new Error("CONTADOR_NO_CONFIGURADO");
       
       const nuevoNumero = (counterDoc.data().ultimoFolio || 0) + 1;
       transaction.update(counterRef, { ultimoFolio: nuevoNumero });
 
-      // C. Formatear Folio (SANSCE-2026-0001)
+      // C. Formatear Folio
       const añoActual = new Date().getFullYear();
       const folioExpediente = `SANSCE-${añoActual}-${nuevoNumero.toString().padStart(4, '0')}`;
 
@@ -56,45 +66,46 @@ exports.handler = async (event, context) => {
           }
       }
 
-      const partesNombre = nombreMayus.split(/\s+/);
-      const nombresWeb = partesNombre[0] || "";
-      const apellidoPWeb = partesNombre[1] || "";
-      const apellidoMWeb = partesNombre.slice(2).join(" ") || "";
+      const partesNombre = nombreLimpio.split(/\s+/);
 
-      // E. Preparar Objeto Final
+      // E. Preparar Objeto Final (SE RESTITUYEN TODOS LOS CAMPOS OMITIDOS)
       const nuevoPaciente = {
-  folioExpediente, // Identificador ISO 7101
-  nombres: nombresWeb,
-  apellidoPaterno: apellidoPWeb,
-  apellidoMaterno: apellidoMWeb,
-  searchKeywords: generarSearchTags(nombreMayus),
-  fechaNacimiento: datos.fechaNacimiento,
-  edad: edadCalculada,
-  genero: datos.genero,
-  telefonoCelular: datos.telefono,
-  email: datos.email,
-  lugarNacimiento: datos.lugarNacimiento || "",
-  lugarResidencia: datos.lugarResidencia || "",
-  estadoCivil: datos.estadoCivil || "",
-  religion: datos.religion || "",
-  escolaridad: datos.escolaridad || "",
-  ocupacion: datos.ocupacion || "",
-  curp: datos.curp ? datos.curp.toUpperCase() : null,
-  grupoEtnico: datos.grupoEtnico || null,
-  medioMarketing: datos.comoSeEntero || "",
-  referidoPor: datos.nombreReferencia || "",
-  datosFiscales: datos.requiereFactura === "true" ? {
-        tipoPersona: datos.tipoPersona || "Fisica",
-        razonSocial: (datos.razonSocial || "").toUpperCase(),
-        rfc: (datos.rfc || "").toUpperCase(),
-        cpFiscal: datos.codigoPostalFiscal || "",
-        emailFacturacion: datos.emailFactura || "",
-        regimenFiscal: datos.regimenFiscal || "",
-        usoCFDI: datos.usoCFDI || ""
-  } : null,
-  fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
-  origen: "web_autoregistro",
-  tutor: null
+        folioExpediente,
+        nombreCompleto: nombreLimpio,
+        nombres: partesNombre[0] || "",
+        apellidoPaterno: partesNombre[1] || "",
+        apellidoMaterno: partesNombre.slice(2).join(" ") || "",
+        searchKeywords: generarSearchTags(nombreLimpio),
+        fechaNacimiento: datos.fechaNacimiento,
+        edad: edadCalculada,
+        genero: datos.genero,
+        telefonoCelular: datos.telefono,
+        email: datos.email,
+        // Campos sociodemográficos restituidos
+        lugarNacimiento: datos.lugarNacimiento || "",
+        lugarResidencia: datos.lugarResidencia || "",
+        estadoCivil: datos.estadoCivil || "",
+        religion: datos.religion || "",
+        escolaridad: datos.escolaridad || "",
+        ocupacion: datos.ocupacion || "",
+        curp: datos.curp ? datos.curp.toUpperCase().trim() : null,
+        grupoEtnico: datos.grupoEtnico || null,
+        // Campos de marketing restituidos
+        medioMarketing: datos.comoSeEntero || "",
+        referidoPor: datos.nombreReferencia || "",
+        // Datos fiscales completos
+        datosFiscales: datos.requiereFactura === "true" ? {
+              tipoPersona: datos.tipoPersona || "Fisica",
+              razonSocial: limpiarAcentos(datos.razonSocial), // MEJORA 2: Razón social sin acentos
+              rfc: (datos.rfc || "").toUpperCase().trim(),
+              cpFiscal: datos.codigoPostalFiscal || "",
+              emailFacturacion: datos.emailFactura || "",
+              regimenFiscal: datos.regimenFiscal || "",
+              usoCFDI: datos.usoCFDI || ""
+        } : null,
+        fechaRegistro: admin.firestore.FieldValue.serverTimestamp(),
+        origen: "web_autoregistro",
+        tutor: null // Campo restituido
       };
 
       const newPacRef = db.collection('pacientes').doc();
@@ -109,6 +120,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
+    // SE RESTITUYE EL MANEJO DE ERRORES ESPECÍFICO
     let msg = "Error interno";
     let code = 500;
     if (error.message === "DUPLICADO_IDENTIDAD") { msg = "Ya existe un expediente con estos datos."; code = 409; }
