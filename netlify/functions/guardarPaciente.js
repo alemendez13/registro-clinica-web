@@ -44,13 +44,29 @@ exports.handler = async (event, context) => {
     const counterRef = db.collection('metadata').doc('pacientes_control');
     
     const result = await db.runTransaction(async (transaction) => {
-      // A. Validar duplicado por identidad clínica [cite: 176]
-      const busquedaIdentidad = await transaction.get(
-        db.collection('pacientes')
-          .where('nombreCompleto', '==', nombreLimpio)
-          .where('fechaNacimiento', '==', datos.fechaNacimiento)
-      );
-      if (!busquedaIdentidad.empty) throw new Error("DUPLICADO_IDENTIDAD");
+      // A. Validar duplicado por identidad clínica (Lógica Fase 3: Prioridad CURP)
+      let posibleDuplicado = false;
+
+      // 1. Si trae CURP, validamos por CURP (Es el identificador más fuerte)
+      if (datos.curp && datos.curp.length > 10) {
+          const busquedaCurp = await transaction.get(
+              db.collection('pacientes')
+              .where('curp', '==', datos.curp.toUpperCase().trim())
+              .limit(1)
+          );
+          if (!busquedaCurp.empty) posibleDuplicado = true;
+      } 
+      // 2. Si no trae CURP, validamos por Nombre + Fecha (Respaldo legacy)
+      else {
+          const busquedaIdentidad = await transaction.get(
+            db.collection('pacientes')
+              .where('nombreCompleto', '==', nombreLimpio)
+              .where('fechaNacimiento', '==', datos.fechaNacimiento)
+          );
+          if (!busquedaIdentidad.empty) posibleDuplicado = true;
+      }
+
+      if (posibleDuplicado) throw new Error("DUPLICADO_IDENTIDAD");
 
       // B. Obtener y actualizar el contador (Validación de configuración preservada) 
       const counterDoc = await transaction.get(counterRef);
